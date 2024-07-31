@@ -11,7 +11,7 @@
 
 ## Motivation
 
-The Circuit Breaker Pattern plays a vital role in ensuring the resilience of your software. It effectively stops failures from cascading, thereby preserving operational stability in the event of service disruptions. This pattern enhances the user experience through clear visual cues, ensuring smooth application performance. Moreover, it simplifies maintenance and troubleshooting processes, facilitating faster problem resolution. In essence, integrating the Circuit Breaker Pattern is indispensable for boosting reliability and user satisfaction.
+The Circuit Breaker Pattern plays a vital role in ensuring the resilience of your software. It effectively stops failures from cascading, thereby preserving operational stability during service disruptions. This pattern enhances the user experience through clear visual cues, ensuring smooth application performance. Moreover, it simplifies maintenance and troubleshooting processes, facilitating faster problem resolution. Integrating the Circuit Breaker Pattern is indispensable for boosting reliability and user satisfaction.
 
 ![circuit-breaker.png](assets/circuit-breaker.png)
 
@@ -25,7 +25,7 @@ For more info, check the official pattern doc [here](https://learn.microsoft.com
 You can install the package globally via composer:
 
 ```
-composer global require algoyounes/circuit-breaker
+composer require algoyounes/circuit-breaker
 ```
 
 ## Usage
