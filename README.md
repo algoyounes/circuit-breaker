@@ -22,7 +22,7 @@ For more info, check the official pattern doc [here](https://learn.microsoft.com
 
 ## Installation
 
-You can install the package globally via composer:
+You can install the package via composer:
 
 ```
 composer require algoyounes/circuit-breaker
