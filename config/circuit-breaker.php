@@ -22,14 +22,36 @@ return [
     |
     */
     'cache' => [
-        'ttl'   => 86400, // 1 day in seconds
-        'store' => 'default',
+        'ttl'    => 86400, // 1 day in seconds
+        'prefix' => 'circuit-breaker',
+        'store'  => 'default',
     ],
 
-    // default config for all service
-    'default' => [
-
+    /*
+    |--------------------------------------------------------------------------
+    | Default Circuit Breaker Settings
+    |--------------------------------------------------------------------------
+    | These settings are used as defaults for all services.
+    */
+    'defaults' => [
+        'failure_threshold' => 5,  // Number of failures before opening the circuit
+        'cooldown_period'   => 60, // Time in seconds before attempting to half-open the circuit
+        'success_threshold' => 3, // Number of successes required to close the circuit
+        'failure_window'    => 30,   // Time window in seconds to consider for failure threshold
+        'success_window'    => 15,  // Time window in seconds to consider for success threshold
     ],
 
-    // TODO: add custom config per service
+    /*
+    |--------------------------------------------------------------------------
+    | Service Configuration
+    |--------------------------------------------------------------------------
+    | service_name => [settings]
+    */
+    'services' => [
+        'delivery_service' => [
+            'failure_threshold' => 10,
+            'cooldown_period' => 120,
+            'success_threshold' => 5,
+        ]
+    ],
 ];
