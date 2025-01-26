@@ -22,5 +22,5 @@ interface StateManagerContract
 
     public function hasExceededThreshold(string $service): bool;
 
-    public function hasSufficientSuccesses(string $service): bool;
+    public function hasSufficientSuccess(string $service): bool;
 }

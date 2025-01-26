@@ -116,7 +116,7 @@ class CircuitStateCacheManager implements StateManagerContract
         return $this->getCounter($service, self::FAILURE_SUFFIX) >= $threshold;
     }
 
-    public function hasSufficientSuccesses(string $service): bool
+    public function hasSufficientSuccess(string $service): bool
     {
         $threshold = $this->config->getServiceConfig($service)->getSuccessThreshold();
 

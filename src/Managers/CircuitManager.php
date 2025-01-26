@@ -21,13 +21,18 @@ class CircuitManager
         return $this->stateManager->getStatus($service);
     }
 
+    public function isServiceAvailable(string $service): bool
+    {
+        return $this->getStatus($service) !== CircuitStatus::OPEN;
+    }
+
     /**
      * @param  array<string>  $services
      */
-    public function areAvailable(array $services): bool
+    public function areServicesAvailable(array $services): bool
     {
         foreach ($services as $service) {
-            if ($this->getStatus($service) === CircuitStatus::OPEN) {
+            if (! $this->isServiceAvailable($service)) {
                 return false;
             }
         }
@@ -47,6 +52,7 @@ class CircuitManager
             if ($this->stateManager->isInCooldown($service)) {
                 return Packet::circuitOpen($service);
             }
+
             $this->stateManager->halfOpen($service);
         }
 
@@ -55,7 +61,8 @@ class CircuitManager
 
             if ($status === CircuitStatus::HALF_OPEN) {
                 $this->stateManager->recordSuccess($service);
-                if ($this->stateManager->hasSufficientSuccesses($service)) {
+
+                if ($this->stateManager->hasSufficientSuccess($service)) {
                     $this->stateManager->close($service);
                 }
             }
