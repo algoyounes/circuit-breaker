@@ -14,6 +14,21 @@ class Packet
     ) {
     }
 
+    public function isSuccess(): bool
+    {
+        return $this->isSuccess;
+    }
+
+    public function getResult(): mixed
+    {
+        return $this->result;
+    }
+
+    public function getErrorMessage(): ?string
+    {
+        return $this->errorMessage;
+    }
+
     public static function success(mixed $result): self
     {
         return new self(
