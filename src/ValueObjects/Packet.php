@@ -24,6 +24,11 @@ class Packet
         return $this->result;
     }
 
+    public function getErrorMessage(): ?string
+    {
+        return $this->errorMessage;
+    }
+
     public static function success(mixed $result): self
     {
         return new self(
