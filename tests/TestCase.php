@@ -1,10 +1,16 @@
 <?php
 
-namespace AlgoYounes\Skeleton\Tests;
+namespace AlgoYounes\CircuitBreaker\Tests;
 
-use PHPUnit\Framework\TestCase as BaseTestCase;
+use AlgoYounes\CircuitBreaker\Providers\CircuitBreakerServiceProvider;
+use Orchestra\Testbench\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
 {
-    //
+    protected function getPackageProviders($app): array
+    {
+        return [
+            CircuitBreakerServiceProvider::class,
+        ];
+    }
 }
