@@ -48,6 +48,7 @@ class CircuitManager
 
         $status = $this->getStatus($service);
 
+        // Handle OPEN status (check cooldown first, otherwise transition to half-open)
         if ($status === CircuitStatus::OPEN) {
             if ($this->stateManager->isInCooldown($service)) {
                 return Packet::circuitOpen($service);
@@ -59,9 +60,11 @@ class CircuitManager
         try {
             $result = $operation();
 
+            // If the service was HALF_OPEN, record success and possibly close the circuit
             if ($status === CircuitStatus::HALF_OPEN) {
                 $this->stateManager->recordSuccess($service);
 
+                // If the service has had sufficient successful calls, close the circuit
                 if ($this->stateManager->hasSufficientSuccess($service)) {
                     $this->stateManager->close($service);
                 }
@@ -69,6 +72,7 @@ class CircuitManager
 
             return Packet::success($result);
         } catch (Throwable $e) {
+            // Record the failure and check if the failure threshold has been exceeded
             $this->stateManager->recordFailure($service);
 
             if ($this->stateManager->hasExceededThreshold($service)) {
