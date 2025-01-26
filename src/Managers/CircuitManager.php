@@ -3,23 +3,27 @@
 namespace AlgoYounes\CircuitBreaker\Managers;
 
 use AlgoYounes\CircuitBreaker\Config\CircuitBreakerConfig;
-use AlgoYounes\CircuitBreaker\Enums\CircuitStatus;
 use AlgoYounes\CircuitBreaker\Contracts\StateManagerContract;
+use AlgoYounes\CircuitBreaker\Enums\CircuitStatus;
 use AlgoYounes\CircuitBreaker\ValueObjects\Packet;
 use Throwable;
 
 class CircuitManager
 {
     public function __construct(
-        private StateManagerContract $stateManager,
-        private CircuitBreakerConfig $config
-    ) {}
+        private readonly StateManagerContract $stateManager,
+        private readonly CircuitBreakerConfig $config
+    ) {
+    }
 
     public function getStatus(string $service): CircuitStatus
     {
         return $this->stateManager->getStatus($service);
     }
 
+    /**
+     * @param  array<string>  $services
+     */
     public function areAvailable(array $services): bool
     {
         foreach ($services as $service) {
@@ -33,12 +37,8 @@ class CircuitManager
 
     public function run(string $service, callable $operation): Packet
     {
-        if (! $this->config->isEnabled()) {
-            try {
-                return Packet::success($operation());
-            } catch (\Exception $e) {
-                return Packet::failure($e->getMessage(), CircuitStatus::CLOSED);
-            }
+        if ($this->config->isNotEnabled()) {
+            return Packet::success($operation());
         }
 
         $status = $this->getStatus($service);

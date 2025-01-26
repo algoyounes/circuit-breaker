@@ -11,7 +11,8 @@ class Packet
         public readonly mixed $result = null,
         public readonly ?string $errorMessage = null,
         public readonly ?CircuitStatus $status = null
-    ) {}
+    ) {
+    }
 
     public static function success(mixed $result): self
     {
@@ -22,7 +23,7 @@ class Packet
         );
     }
 
-    public static function failure(string $errorMessage, CircuitStatus $status): self
+    public static function failure(string $errorMessage, CircuitStatus $status = CircuitStatus::CLOSED): self
     {
         return new self(
             isSuccess: false,

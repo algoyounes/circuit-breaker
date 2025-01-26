@@ -52,6 +52,6 @@ return [
             'failure_threshold' => 10,
             'cooldown_period' => 120,
             'success_threshold' => 5,
-        ]
+        ],
     ],
 ];

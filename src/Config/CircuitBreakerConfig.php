@@ -11,7 +11,6 @@ class CircuitBreakerConfig
     public const CACHE_TTL_KEY = 'cache.ttl';
     public const CACHE_PREFIX_KEY = 'cache.prefix';
     public const CACHE_STORE_KEY = 'cache.store';
-
     public const DEFAULTS_KEY = 'defaults';
     public const SERVICES_KEY = 'services';
 
@@ -35,9 +34,12 @@ class CircuitBreakerConfig
         private readonly string $cachePrefix,
         private readonly string $cacheStore,
         private readonly ServiceConfig $defaults,
+        /** @var array<string, array<string, int>> $services */
         private readonly array $services
-    ) {}
+    ) {
+    }
 
+    // @phpstan-ignore-next-line
     public static function createFromArray(array $attributes): self
     {
         $get = static fn (string $key, int|bool|string|array|null $default = null) => $attributes[$key] ?? $default;
@@ -49,12 +51,14 @@ class CircuitBreakerConfig
             )
         );
 
+        /** @var array<string, array<string, int>> $rawServices */
+        $rawServices = $get(self::SERVICES_KEY, []);
+
         $services = [];
-        foreach ($get(self::SERVICES_KEY, []) as $serviceName => $serviceConfig) {
-            $services[$serviceName] = array_intersect_key(
-                (array) $serviceConfig,
-                self::DEFAULT_SERVICE_PARAMS
-            );
+        foreach ($rawServices as $serviceName => $serviceConfig) {
+            $filteredConfig = array_intersect_key($serviceConfig, self::DEFAULT_SERVICE_PARAMS);
+
+            $services[$serviceName] = array_map('intval', $filteredConfig);
         }
 
         return new self(
@@ -80,6 +84,11 @@ class CircuitBreakerConfig
     public function isEnabled(): bool
     {
         return $this->enabled;
+    }
+
+    public function isNotEnabled(): bool
+    {
+        return $this->isEnabled() === false;
     }
 
     public function getCacheTtl(int $default = self::DEFAULT_CACHE_TTL): int

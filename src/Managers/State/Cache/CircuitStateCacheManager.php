@@ -1,11 +1,11 @@
 <?php
 
-namespace AlgoYounes\CircuitBreaker\Managers\Stats\Cache;
+namespace AlgoYounes\CircuitBreaker\Managers\State\Cache;
 
-use Carbon\Carbon;
 use AlgoYounes\CircuitBreaker\Config\CircuitBreakerConfig;
 use AlgoYounes\CircuitBreaker\Contracts\StateManagerContract;
 use AlgoYounes\CircuitBreaker\Enums\CircuitStatus;
+use Carbon\Carbon;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 
 class CircuitStateCacheManager implements StateManagerContract
@@ -21,7 +21,8 @@ class CircuitStateCacheManager implements StateManagerContract
     public function __construct(
         private readonly CacheRepository $cache,
         private readonly CircuitBreakerConfig $config
-    ) {}
+    ) {
+    }
 
     private function getCacheKey(string $circuitKey, string $suffix): string
     {
@@ -33,7 +34,7 @@ class CircuitStateCacheManager implements StateManagerContract
         );
     }
 
-    private function setWithConfigTtl(string $key, $value): void
+    private function setWithConfigTtl(string $key, mixed $value): void
     {
         $this->cache->set($key, $value, $this->config->getCacheTtl());
     }
@@ -44,6 +45,10 @@ class CircuitStateCacheManager implements StateManagerContract
             $this->getCacheKey($service, self::STATUS_SUFFIX),
             CircuitStatus::CLOSED->value
         );
+
+        if (! is_string($value)) {
+            return CircuitStatus::CLOSED;
+        }
 
         return CircuitStatus::tryFrom($value) ?? CircuitStatus::CLOSED;
     }
@@ -86,6 +91,10 @@ class CircuitStateCacheManager implements StateManagerContract
             $this->getCacheKey($service, self::COOLDOWN_END_SUFFIX)
         );
 
+        if (! is_int($cooldownEnd)) {
+            return false;
+        }
+
         return $cooldownEnd && Carbon::now()->lessThan(Carbon::createFromTimestamp($cooldownEnd));
     }
 
@@ -122,6 +131,8 @@ class CircuitStateCacheManager implements StateManagerContract
 
     private function getCounter(string $service, string $type): int
     {
-        return (int) $this->cache->get($this->getCacheKey($service, $type), 0);
+        $value = $this->cache->get($this->getCacheKey($service, $type), 0);
+
+        return is_int($value) ? $value : 0;
     }
 }
