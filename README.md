@@ -9,10 +9,6 @@
 <a href="https://packagist.org/packages/algoyounes/circuit-breaker"><img src="https://img.shields.io/packagist/l/algoyounes/circuit-breaker" alt="License"></a>
 </p>
 
-## Areas of Improvement 🍄
-There are several areas of improvement that can be made to the current solution, such as:
-- [ ] Add unit test cases 🧪
-
 ## Motivation
 
 The Circuit Breaker Pattern plays a vital role in ensuring the resilience of your software. It effectively stops failures from cascading, thereby preserving operational stability during service disruptions. This pattern enhances the user experience through clear visual cues, ensuring smooth application performance. Moreover, it simplifies maintenance and troubleshooting processes, facilitating faster problem resolution. Integrating the Circuit Breaker Pattern is indispensable for boosting reliability and user satisfaction.
