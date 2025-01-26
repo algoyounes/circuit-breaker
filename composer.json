@@ -1,15 +1,10 @@
 {
-    "name": "algoyounes/laravel-package-skeleton",
-    "description": "Laravel Package Skeleton for streamlined package development",
+    "name": "algoyounes/circuit-breaker",
+    "description": "Circuit Breaker is laravel package that provides a way to handle failures gracefully",
     "keywords": [
-        "laravel",
-        "package",
-        "skeleton",
-        "skeleton-package",
-        "laravel package",
-        "laravel package skeleton",
-        "package skeleton",
-        "package development"
+        "circuit breaker",
+        "laravel circuit breaker",
+        "php circuit breaker"
     ],
     "type": "library",
     "license": "MIT",
@@ -21,7 +16,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "AlgoYounes\\Skeleton\\": "src/"
+            "AlgoYounes\\CircuitBreaker\\": "src/"
         },
         "files": [
             "./helpers.php"
@@ -29,7 +24,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "AlgoYounes\\Skeleton\\Tests\\": "tests"
+            "AlgoYounes\\CircuitBreaker\\Tests\\": "tests"
         }
     },
     "require": {
@@ -89,6 +84,13 @@
         "preferred-install": "dist",
         "allow-plugins": {
             "pestphp/pest-plugin": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "AlgoYounes\\CircuitBreaker\\Providers\\CircuitBreakerServiceProvider"
+            ]
         }
     },
     "minimum-stability": "stable",
