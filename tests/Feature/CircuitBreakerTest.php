@@ -47,4 +47,3 @@ it('returns failure packet when circuit is half-open and operation fails', funct
         ->and($result->isSuccess())->toBeFalse()
         ->and($result->getErrorMessage())->toBe('Payment service is down');
 });
-
