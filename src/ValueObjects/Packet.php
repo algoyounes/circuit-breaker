@@ -19,6 +19,11 @@ class Packet
         return $this->isSuccess;
     }
 
+    public function isFailure(): bool
+    {
+        return $this->isSuccess === false;
+    }
+
     public function getResult(): mixed
     {
         return $this->result;

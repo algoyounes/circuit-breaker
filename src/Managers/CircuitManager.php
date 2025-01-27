@@ -2,6 +2,7 @@
 
 namespace AlgoYounes\CircuitBreaker\Managers;
 
+use AlgoYounes\CircuitBreaker\Builder\CircuitBuilder;
 use AlgoYounes\CircuitBreaker\Config\CircuitBreakerConfig;
 use AlgoYounes\CircuitBreaker\Contracts\StateManagerContract;
 use AlgoYounes\CircuitBreaker\Enums\CircuitStatus;
@@ -16,23 +17,27 @@ class CircuitManager
     ) {
     }
 
+    public function forService(string $service): CircuitBuilder
+    {
+        return new CircuitBuilder($this, $service);
+    }
+
     public function getStatus(string $service): CircuitStatus
     {
         return $this->stateManager->getStatus($service);
     }
 
-    public function isServiceAvailable(string $service): bool
-    {
-        return $this->getStatus($service) !== CircuitStatus::OPEN;
-    }
-
     /**
-     * @param  array<string>  $services
+     * @param  string|array<string>  $services
      */
-    public function areServicesAvailable(array $services): bool
+    public function isServiceAvailable(string|array $services): bool
     {
+        if (is_string($services)) {
+            return $this->getStatus($services) !== CircuitStatus::OPEN;
+        }
+
         foreach ($services as $service) {
-            if (! $this->isServiceAvailable($service)) {
+            if ($this->getStatus($service) === CircuitStatus::OPEN) {
                 return false;
             }
         }
