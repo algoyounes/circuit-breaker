@@ -1,5 +1,5 @@
 <p align="center">
-<img style="border-radius: 5px; max-width: 100%;" src="assets/logo.jpeg" alt="CSV Forge Logo"/>
+<img style="border-radius: 5px; max-width: 100%;" src="assets/logo.jpeg" alt="Circuit Breaker Logo"/>
 </p>
 <p align="center">
 <a href="https://github.com/algoyounes/circuit-breaker/actions"><img src="https://github.com/algoyounes/circuit-breaker/actions/workflows/unit-tests.yml/badge.svg" alt="Build Status"></a>
@@ -8,7 +8,7 @@
 <a href="https://packagist.org/packages/algoyounes/circuit-breaker"><img src="https://img.shields.io/packagist/l/algoyounes/circuit-breaker" alt="License"></a>
 </p>
 
-Circuit Breaker is a laravel package that provides a simple and efficient way to manage service calls and prevent cascading failures. 
+Circuit Breaker is a Laravel package that provides a simple and efficient way to manage service calls and prevent cascading failures. 
 It allows you to define custom callbacks for key circuit states and run operations with circuit breaker logic.
 
 The following diagram illustrates how the Circuit Breaker pattern works:
