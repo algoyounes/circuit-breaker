@@ -45,13 +45,17 @@ return [
     |--------------------------------------------------------------------------
     | Service Configuration
     |--------------------------------------------------------------------------
+    | These settings are used to configure the circuit breaker for specific services.
     | service_name => [settings]
     */
     'services' => [
+        // Example service configuration
+        /*
         'delivery_service' => [
             'failure_threshold' => 10,
             'cooldown_period' => 120,
             'success_threshold' => 5,
         ],
+        */
     ],
 ];
