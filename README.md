@@ -76,7 +76,7 @@ $circuit->run(function () {
 This will execute the provided closure, applying the circuit breaker logic _(e.g., open, half-open, closed states)_ around the service call.
 
 > [!NOTE]
-> Tip: If you prefer a more direct approach, you can create a CircuitBuilder instance:
+> If you prefer a more direct approach, you can create a `CircuitBuilder` instance:
 > ```php
 > $circuit = CircuitBuilder::make('service-name')
 > ```
