@@ -1,6 +1,5 @@
 <p align="center">
-<img width="150" height="150" src="assets/logo.png" alt="Circuit Breaker Logo"/>
-<br><b>Circuit Breaker</b>
+<img style="border-radius: 5px; max-width: 100%;" src="assets/logo.jpeg" alt="CSV Forge Logo"/>
 </p>
 <p align="center">
 <a href="https://github.com/algoyounes/circuit-breaker/actions"><img src="https://github.com/algoyounes/circuit-breaker/actions/workflows/unit-tests.yml/badge.svg" alt="Build Status"></a>
@@ -9,9 +8,10 @@
 <a href="https://packagist.org/packages/algoyounes/circuit-breaker"><img src="https://img.shields.io/packagist/l/algoyounes/circuit-breaker" alt="License"></a>
 </p>
 
-## Motivation
+Circuit Breaker is a laravel package that provides a simple and efficient way to manage service calls and prevent cascading failures. 
+It allows you to define custom callbacks for key circuit states and run operations with circuit breaker logic.
 
-The Circuit Breaker Pattern plays a vital role in ensuring the resilience of your software. It effectively stops failures from cascading, thereby preserving operational stability during service disruptions. This pattern enhances the user experience through clear visual cues, ensuring smooth application performance. Moreover, it simplifies maintenance and troubleshooting processes, facilitating faster problem resolution. Integrating the Circuit Breaker Pattern is indispensable for boosting reliability and user satisfaction.
+The following diagram illustrates how the Circuit Breaker pattern works:
 
 ![circuit-breaker.png](assets/circuit-breaker.png)
 
