@@ -33,7 +33,7 @@ class CircuitBreakerServiceProvider extends ServiceProvider
                 $configRepository = $app->make(ConfigRepository::class);
                 $config = (array) $configRepository->get('circuit-breaker', []);
 
-                return CircuitBreakerConfig::createFromArray($config);
+                return $this->config = CircuitBreakerConfig::createFromArray($config);
             }
         );
 
@@ -46,7 +46,7 @@ class CircuitBreakerServiceProvider extends ServiceProvider
         $this->app->bind(
             StateManagerContract::class,
             function (Application $app): StateManagerContract {
-                $config = $this->getConfig($app);
+                $config = $this->getConfig();
                 $cache = $this->getCacheRepository($app);
 
                 return new CircuitStateCacheManager($cache, $config);
@@ -73,14 +73,14 @@ class CircuitBreakerServiceProvider extends ServiceProvider
         return $cacheStore;
     }
 
-    private function getConfig(?Application $app = null): CircuitBreakerConfig
+    private function getConfig(): CircuitBreakerConfig
     {
         if ($this->config instanceof CircuitBreakerConfig) {
             return $this->config;
         }
 
         /** @var CircuitBreakerConfig $config */
-        $config = ($app ?? $this->app)->make(CircuitBreakerConfig::class);
+        $config = $this->app->make(CircuitBreakerConfig::class);
 
         return $this->config = $config;
     }
