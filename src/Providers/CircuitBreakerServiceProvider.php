@@ -64,13 +64,12 @@ class CircuitBreakerServiceProvider extends ServiceProvider
 
     private function getCacheStoreName(): string
     {
-        $cacheStore = $this->getConfig()->getCacheStore();
-        if ($cacheStore === CircuitBreakerConfig::DEFAULT_CACHE_STORE) {
+        if ($this->getConfig()->isDefaultCacheStore()) {
             // @phpstan-ignore-next-line
             return config('cache.default');
         }
 
-        return $cacheStore;
+        return $this->getConfig()->getCacheStore();
     }
 
     private function getConfig(): CircuitBreakerConfig

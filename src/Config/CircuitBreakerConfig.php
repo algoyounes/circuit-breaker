@@ -101,6 +101,11 @@ class CircuitBreakerConfig
         return $this->cacheStore;
     }
 
+    public function isDefaultCacheStore(): bool
+    {
+        return $this->getCacheStore() === self::DEFAULT_CACHE_STORE;
+    }
+
     public function getCachePrefix(): string
     {
         return $this->cachePrefix;
