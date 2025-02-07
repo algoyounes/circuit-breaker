@@ -98,3 +98,10 @@ $this->circuitManager->run('service-name', function () {
 $this->circuitManager->run('service-name', $this->serviceName->create(...));
 ```
 
+## Contributing
+
+Thank you for considering contributing to the Circuit Breaker package! Please check the [CONTRIBUTING](CONTRIBUTING.md) file for more details.
+
+## License
+
+The Circuit Breaker package is open-sourced software licensed under the [MIT license](LICENSE).
