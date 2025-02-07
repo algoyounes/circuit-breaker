@@ -2,6 +2,16 @@
 
 All notable changes to `laravel circuit breaker` will be documented in this file
 
+## v1.0.2 - 2025-02-07
+
+### What's Changed
+
+* Service Provider > Simplified getConfig method by removing an unnecessary parameter
+* Facade > Added PHP-doc annotations for service methods
+* Service Provider > Streamlined default cache store check
+
+**Full Changelog**: https://github.com/algoyounes/circuit-breaker/compare/v1.0.0...v1.0.2
+
 ## v1.0.0 - 2025-01-27
 
 🎉 **Circuit Breaker v1.0.0** is here!
