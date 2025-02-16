@@ -19,13 +19,12 @@ class CircuitBuilder
     public function __construct(
         private readonly CircuitManager $circuitManager,
         private readonly string $serviceName
-    ) {
-    }
+    ) {}
 
     public static function make(string $serviceName): self
     {
         return new self(
-            make(CircuitManager::class),
+            app(CircuitManager::class),
             $serviceName,
         );
     }

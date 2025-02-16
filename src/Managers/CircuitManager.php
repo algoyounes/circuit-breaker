@@ -14,8 +14,7 @@ class CircuitManager
     public function __construct(
         private readonly StateManagerContract $stateManager,
         private readonly CircuitBreakerConfig $config
-    ) {
-    }
+    ) {}
 
     public function forService(string $service): CircuitBuilder
     {

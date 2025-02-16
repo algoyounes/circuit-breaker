@@ -17,10 +17,7 @@
     "autoload": {
         "psr-4": {
             "AlgoYounes\\CircuitBreaker\\": "src/"
-        },
-        "files": [
-            "./helpers.php"
-        ]
+        }
     },
     "autoload-dev": {
         "psr-4": {

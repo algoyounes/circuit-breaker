@@ -36,8 +36,7 @@ class CircuitBreakerConfig
         private readonly ServiceConfig $defaults,
         /** @var array<string, array<string, int>> $services */
         private readonly array $services
-    ) {
-    }
+    ) {}
 
     // @phpstan-ignore-next-line
     public static function createFromArray(array $attributes): self

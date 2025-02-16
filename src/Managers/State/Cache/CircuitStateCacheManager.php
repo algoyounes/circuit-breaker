@@ -21,8 +21,7 @@ class CircuitStateCacheManager implements StateManagerContract
     public function __construct(
         private readonly CacheRepository $cache,
         private readonly CircuitBreakerConfig $config
-    ) {
-    }
+    ) {}
 
     private function getCacheKey(string $circuitKey, string $suffix): string
     {

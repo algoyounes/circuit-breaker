@@ -23,8 +23,7 @@ readonly class ServiceConfig implements Arrayable
         private int $successThreshold,
         private int $failureWindow,
         private int $successWindow
-    ) {
-    }
+    ) {}
 
     public function getFailureThreshold(): int
     {

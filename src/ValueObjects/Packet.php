@@ -11,8 +11,7 @@ class Packet
         public readonly mixed $result = null,
         public readonly ?string $errorMessage = null,
         public readonly ?CircuitStatus $status = null
-    ) {
-    }
+    ) {}
 
     public function isSuccess(): bool
     {
