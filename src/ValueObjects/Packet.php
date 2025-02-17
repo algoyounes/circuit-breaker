@@ -3,14 +3,16 @@
 namespace AlgoYounes\CircuitBreaker\ValueObjects;
 
 use AlgoYounes\CircuitBreaker\Enums\CircuitStatus;
+use AlgoYounes\CircuitBreaker\Exceptions\CircuitAlreadyOpenedException;
+use Throwable;
 
-class Packet
+readonly class Packet
 {
     public function __construct(
-        public readonly bool $isSuccess,
-        public readonly mixed $result = null,
-        public readonly ?string $errorMessage = null,
-        public readonly ?CircuitStatus $status = null
+        public bool $isSuccess,
+        public CircuitStatus $status,
+        public mixed $result = null,
+        public ?Throwable $error = null
     ) {}
 
     public function isSuccess(): bool
@@ -28,35 +30,47 @@ class Packet
         return $this->result;
     }
 
+    public function getError(): ?Throwable
+    {
+        return $this->error;
+    }
+
     public function getErrorMessage(): ?string
     {
-        return $this->errorMessage;
+        return $this->error?->getMessage();
+    }
+
+    public function getStatus(): CircuitStatus
+    {
+        return $this->status;
     }
 
     public static function success(mixed $result): self
     {
         return new self(
             isSuccess: true,
-            result: $result,
-            status: CircuitStatus::CLOSED
+            status: CircuitStatus::CLOSED,
+            result: $result
         );
     }
 
-    public static function failure(string $errorMessage, CircuitStatus $status = CircuitStatus::CLOSED): self
+    public static function failure(Throwable $error, CircuitStatus $status = CircuitStatus::CLOSED): self
     {
         return new self(
             isSuccess: false,
-            errorMessage: $errorMessage,
-            status: $status
+            status: $status,
+            error: $error
         );
     }
 
-    public static function circuitOpen(string $service): self
+    public static function circuitOpen(string $service, ?Throwable $error = null): self
     {
+        $error ??= new CircuitAlreadyOpenedException($service);
+
         return new self(
             isSuccess: false,
-            errorMessage: "Circuit is open for service: $service",
-            status: CircuitStatus::OPEN
+            status: CircuitStatus::OPEN,
+            error: $error
         );
     }
 }

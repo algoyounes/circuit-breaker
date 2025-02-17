@@ -52,26 +52,30 @@ class CircuitManager
 
         $status = $this->getStatus($service);
 
-        // Handle OPEN status (check cooldown first, otherwise transition to half-open)
-        if ($status === CircuitStatus::OPEN) {
-            if ($this->stateManager->isInCooldown($service)) {
-                return Packet::circuitOpen($service);
-            }
+        // Return early if the service is OPEN and in cooldown
+        if ($status === CircuitStatus::OPEN && $this->stateManager->isInCooldown($service)) {
+            return Packet::circuitOpen($service);
+        }
 
+        // Transition to half-open if the status is OPEN and not in cooldown
+        if ($status === CircuitStatus::OPEN) {
             $this->stateManager->halfOpen($service);
         }
 
         try {
             $result = $operation();
 
-            // If the service was HALF_OPEN, record success and possibly close the circuit
-            if ($status === CircuitStatus::HALF_OPEN) {
-                $this->stateManager->recordSuccess($service);
+            // Return earlier is the status is different from HALF_OPEN
+            if ($status !== CircuitStatus::HALF_OPEN) {
+                return Packet::success($result);
+            }
 
-                // If the service has had sufficient successful calls, close the circuit
-                if ($this->stateManager->hasSufficientSuccess($service)) {
-                    $this->stateManager->close($service);
-                }
+            // If the service was HALF_OPEN, record success and possibly close the circuit
+            $this->stateManager->recordSuccess($service);
+
+            // If the service has had sufficient successful calls, close the circuit
+            if ($this->stateManager->hasSufficientSuccess($service)) {
+                $this->stateManager->close($service);
             }
 
             return Packet::success($result);
@@ -82,10 +86,10 @@ class CircuitManager
             if ($this->stateManager->hasExceededThreshold($service)) {
                 $this->stateManager->open($service);
 
-                return Packet::circuitOpen($service);
+                return Packet::circuitOpen($service, $e);
             }
 
-            return Packet::failure($e->getMessage(), $this->getStatus($service));
+            return Packet::failure($e, $this->getStatus($service));
         }
     }
 }

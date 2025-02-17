@@ -55,22 +55,30 @@ class CircuitStateCacheManager implements StateManagerContract
     public function open(string $service): void
     {
         $serviceConfig = $this->config->getServiceConfig($service);
-        $cooldownEnd = Carbon::now()->addSeconds($serviceConfig->getCooldownPeriod())->getTimestamp();
+        $cooldownPeriod = max(1, $serviceConfig->getCooldownPeriod());
+        $currentStatus = $this->getStatus($service);
+
+        if ($currentStatus !== CircuitStatus::OPEN) {
+            $cooldownEnd = Carbon::now()->addSeconds($cooldownPeriod)->getTimestamp();
+
+            $this->setWithConfigTtl(
+                $this->getCacheKey($service, self::COOLDOWN_END_SUFFIX),
+                $cooldownEnd
+            );
+        }
 
         $this->setWithConfigTtl(
             $this->getCacheKey($service, self::STATUS_SUFFIX),
             CircuitStatus::OPEN->value
         );
 
-        $this->setWithConfigTtl(
-            $this->getCacheKey($service, self::COOLDOWN_END_SUFFIX),
-            $cooldownEnd
-        );
+        $this->resetCounters($service);
     }
 
     public function close(string $service): void
     {
         $this->cache->forget($this->getCacheKey($service, self::STATUS_SUFFIX));
+        $this->cache->forget($this->getCacheKey($service, self::COOLDOWN_END_SUFFIX));
         $this->resetCounters($service);
     }
 
