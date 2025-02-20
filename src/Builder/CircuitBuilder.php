@@ -4,6 +4,7 @@ namespace AlgoYounes\CircuitBreaker\Builder;
 
 use AlgoYounes\CircuitBreaker\Enums\CircuitStatus;
 use AlgoYounes\CircuitBreaker\Managers\CircuitManager;
+use AlgoYounes\CircuitBreaker\ValueObjects\CircuitContext;
 use AlgoYounes\CircuitBreaker\ValueObjects\Packet;
 use Closure;
 
@@ -82,42 +83,44 @@ class CircuitBuilder
 
         $newState = $this->circuitManager->getStatus($this->serviceName);
 
-        $this->handleStateChange($initialState, $newState);
+        $context = CircuitContext::forStateChange($initialState, $newState);
+
+        $this->handleStateChange($context);
 
         if ($this->onSuccessCallback && $result->isSuccess()) {
-            $this->triggerCallback($this->onSuccessCallback);
+            $this->triggerCallback($this->onSuccessCallback, $result, $context);
 
             return $result;
         }
 
         if ($this->onFailureCallback && $result->isFailure()) {
-            $this->triggerCallback($this->onFailureCallback);
+            $this->triggerCallback($this->onFailureCallback, $result, $context);
         }
 
         return $result;
     }
 
-    private function handleStateChange(CircuitStatus $initialState, CircuitStatus $newState): void
+    private function handleStateChange(CircuitContext $context): void
     {
-        if ($initialState === $newState) {
-            $this->triggerCallback($this->onSteadyStateCallback);
+        if ($context->getPreviousState()->equals($context->getNewState())) {
+            $this->triggerCallback($this->onSteadyStateCallback, $context);
 
             return;
         }
 
-        match ($newState) {
-            CircuitStatus::OPEN => $this->triggerCallback($this->onOpenCallback),
-            CircuitStatus::HALF_OPEN => $this->triggerCallback($this->onHalfOpenCallback),
-            CircuitStatus::CLOSED => $this->triggerCallback($this->onCloseCallback),
+        match ($context->getNewState()) {
+            CircuitStatus::OPEN => $this->triggerCallback($this->onOpenCallback, $context),
+            CircuitStatus::HALF_OPEN => $this->triggerCallback($this->onHalfOpenCallback, $context),
+            CircuitStatus::CLOSED => $this->triggerCallback($this->onCloseCallback, $context),
         };
     }
 
-    private function triggerCallback(?Closure $callback): void
+    private function triggerCallback(?Closure $callback, mixed ...$args): void
     {
         if (! $callback instanceof Closure) {
             return;
         }
 
-        $callback($this->serviceName);
+        $callback(...$args);
     }
 }
