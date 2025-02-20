@@ -32,11 +32,11 @@ class CircuitManager
     public function isServiceAvailable(string|array $services): bool
     {
         if (is_string($services)) {
-            return $this->getStatus($services) !== CircuitStatus::OPEN;
+            return $this->getStatus($services)->notEquals(CircuitStatus::OPEN);
         }
 
         foreach ($services as $service) {
-            if ($this->getStatus($service) === CircuitStatus::OPEN) {
+            if ($this->getStatus($service)->equals(CircuitStatus::OPEN)) {
                 return false;
             }
         }
@@ -53,12 +53,12 @@ class CircuitManager
         $status = $this->getStatus($service);
 
         // Return early if the service is OPEN and in cooldown
-        if ($status === CircuitStatus::OPEN && $this->stateManager->isInCooldown($service)) {
+        if ($status->equals(CircuitStatus::OPEN) && $this->stateManager->isInCooldown($service)) {
             return Packet::circuitOpen($service);
         }
 
         // Transition to half-open if the status is OPEN and not in cooldown
-        if ($status === CircuitStatus::OPEN) {
+        if ($status->equals(CircuitStatus::OPEN)) {
             $this->stateManager->halfOpen($service);
         }
 
@@ -66,7 +66,7 @@ class CircuitManager
             $result = $operation();
 
             // Return earlier is the status is different from HALF_OPEN
-            if ($status !== CircuitStatus::HALF_OPEN) {
+            if ($status->notEquals(CircuitStatus::HALF_OPEN)) {
                 return Packet::success($result);
             }
 
