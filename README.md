@@ -47,12 +47,14 @@ $circuit = $this->circuitManager->forService('service-name');
 ### Custom Callbacks
 You can define callbacks for key circuit states:
 
-- `onOpen`: Triggered when the circuit goes into **OPEN**, blocking calls to prevent further failures
-- `onHalfOpen`: The circuit enters **HALF-OPEN** to test if things are stable again, letting a few requests through
-- `onClose`: The circuit returns to **CLOSED**, allowing all requests to pass through without restrictions
-- `onSuccess`: Fires when a request succeeds, indicating the system is available
-- `onFailure`: Triggered when a request fails, which may cause the circuit to open and block further requests
-- `onSteadyState`: Indicates the circuit is stable, with no need for changes
+| Callback        | Description                                                                               | Parameters Received        |
+|-----------------|-------------------------------------------------------------------------------------------|----------------------------| 
+| `onOpen`        | Triggered when the circuit goes into **OPEN**, blocking calls to prevent further failures | `CircuitContext`           |
+| `onHalfOpen`    | The circuit enters **HALF-OPEN** to test stability, letting a few requests through        | `CircuitContext`           |
+| `onClose`       | The circuit returns to **CLOSED**, allowing all requests without restrictions             | `CircuitContext`           |
+| `onSuccess`     | Fires when a request succeeds, indicating system availability                             | `Packet`, `CircuitContext` |
+| `onFailure`     | Triggered when a request fails, potentially opening the circuit                           | `Packet`, `CircuitContext` |
+| `onSteadyState` | Indicates the circuit is stable, with no need for changes                                 | `CircuitContext`           |
 
 Example of defining callbacks:
 
