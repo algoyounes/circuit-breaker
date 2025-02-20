@@ -58,13 +58,15 @@ Example of defining callbacks:
 
 ```php
 
-$circuit->onOpen(function () {
+$circuit->onOpen(function (CircuitContext $context) { 
     // Your custom logic here
 });
 
-$circuit->onSuccess(function () {
+$circuit->onSuccess(function (Packet $packet, CircuitContext $context) {
     // Your custom logic here
 });
+
+// Params passed are optional
 ```
 
 ### Running an Operation
