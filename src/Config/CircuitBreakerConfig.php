@@ -6,13 +6,13 @@ class CircuitBreakerConfig
 {
     // Config keys
     public const ENABLED_KEY = 'enabled';
+    public const DEFAULTS_KEY = 'defaults';
+    public const SERVICES_KEY = 'services';
 
     // Cache config keys
     public const CACHE_TTL_KEY = 'cache.ttl';
     public const CACHE_PREFIX_KEY = 'cache.prefix';
     public const CACHE_STORE_KEY = 'cache.store';
-    public const DEFAULTS_KEY = 'defaults';
-    public const SERVICES_KEY = 'services';
 
     // Default values
     private const DEFAULT_ENABLED = true;

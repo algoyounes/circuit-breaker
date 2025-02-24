@@ -8,13 +8,9 @@ readonly class ServiceConfig implements Arrayable
 {
     // Service parameter keys
     public const FAILURE_THRESHOLD_KEY = 'failure_threshold';
-
     public const COOLDOWN_PERIOD_KEY = 'cooldown_period';
-
     public const SUCCESS_THRESHOLD_KEY = 'success_threshold';
-
     public const FAILURE_WINDOW_KEY = 'failure_window';
-
     public const SUCCESS_WINDOW_KEY = 'success_window';
 
     public function __construct(
