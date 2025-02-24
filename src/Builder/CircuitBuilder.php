@@ -4,8 +4,8 @@ namespace AlgoYounes\CircuitBreaker\Builder;
 
 use AlgoYounes\CircuitBreaker\Enums\CircuitStatus;
 use AlgoYounes\CircuitBreaker\Managers\CircuitManager;
-use AlgoYounes\CircuitBreaker\ValueObjects\CircuitContext;
-use AlgoYounes\CircuitBreaker\ValueObjects\Packet;
+use AlgoYounes\CircuitBreaker\ValueObjects\CircuitResult;
+use AlgoYounes\CircuitBreaker\ValueObjects\CircuitTransition;
 use Closure;
 
 class CircuitBuilder
@@ -72,7 +72,7 @@ class CircuitBuilder
         return $this;
     }
 
-    public function run(Closure $operation): Packet
+    public function run(Closure $operation): CircuitResult
     {
         $initialState = $this->circuitManager->getStatus($this->serviceName);
 
@@ -83,7 +83,7 @@ class CircuitBuilder
 
         $newState = $this->circuitManager->getStatus($this->serviceName);
 
-        $context = CircuitContext::forStateChange($initialState, $newState);
+        $context = CircuitTransition::forStateChange($initialState, $newState);
 
         $this->handleStateChange($context);
 
@@ -100,7 +100,7 @@ class CircuitBuilder
         return $result;
     }
 
-    private function handleStateChange(CircuitContext $context): void
+    private function handleStateChange(CircuitTransition $context): void
     {
         if ($context->getPreviousState()->equals($context->getNewState())) {
             $this->triggerCallback($this->onSteadyStateCallback, $context);

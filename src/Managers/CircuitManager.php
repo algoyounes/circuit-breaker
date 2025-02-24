@@ -6,7 +6,7 @@ use AlgoYounes\CircuitBreaker\Builder\CircuitBuilder;
 use AlgoYounes\CircuitBreaker\Config\CircuitBreakerConfig;
 use AlgoYounes\CircuitBreaker\Contracts\StateManagerContract;
 use AlgoYounes\CircuitBreaker\Enums\CircuitStatus;
-use AlgoYounes\CircuitBreaker\ValueObjects\Packet;
+use AlgoYounes\CircuitBreaker\ValueObjects\CircuitResult;
 use Throwable;
 
 class CircuitManager
@@ -44,17 +44,17 @@ class CircuitManager
         return true;
     }
 
-    public function run(string $service, callable $operation): Packet
+    public function run(string $service, callable $operation): CircuitResult
     {
         if ($this->config->isNotEnabled()) {
-            return Packet::success($operation());
+            return CircuitResult::success($operation());
         }
 
         $status = $this->getStatus($service);
 
         // Return early if the service is OPEN and in cooldown
         if ($status->equals(CircuitStatus::OPEN) && $this->stateManager->isInCooldown($service)) {
-            return Packet::circuitOpen($service);
+            return CircuitResult::circuitOpen($service);
         }
 
         // Transition to half-open if the status is OPEN and not in cooldown
@@ -67,7 +67,7 @@ class CircuitManager
 
             // Return earlier is the status is different from HALF_OPEN
             if ($status->notEquals(CircuitStatus::HALF_OPEN)) {
-                return Packet::success($result);
+                return CircuitResult::success($result);
             }
 
             // If the service was HALF_OPEN, record success and possibly close the circuit
@@ -78,7 +78,7 @@ class CircuitManager
                 $this->stateManager->close($service);
             }
 
-            return Packet::success($result);
+            return CircuitResult::success($result);
         } catch (Throwable $e) {
             // Record the failure and check if the failure threshold has been exceeded
             $this->stateManager->recordFailure($service);
@@ -86,10 +86,10 @@ class CircuitManager
             if ($this->stateManager->hasExceededThreshold($service)) {
                 $this->stateManager->open($service);
 
-                return Packet::circuitOpen($service, $e);
+                return CircuitResult::circuitOpen($service, $e);
             }
 
-            return Packet::failure($e, $this->getStatus($service));
+            return CircuitResult::failure($e, $this->getStatus($service));
         }
     }
 }

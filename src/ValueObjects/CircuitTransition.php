@@ -3,17 +3,17 @@
 namespace AlgoYounes\CircuitBreaker\ValueObjects;
 
 use AlgoYounes\CircuitBreaker\Enums\CircuitStatus;
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 
-readonly class CircuitContext
+readonly class CircuitTransition
 {
-    private Carbon $occurredAt;
+    private CarbonImmutable $occurredAt;
 
     public function __construct(
         public CircuitStatus $previousState,
         public CircuitStatus $newState,
     ) {
-        $this->occurredAt = Carbon::now();
+        $this->occurredAt = CarbonImmutable::now();
     }
 
     public static function forStateChange(
@@ -23,7 +23,7 @@ readonly class CircuitContext
         return new self($previousState, $newState);
     }
 
-    public function getOccurredAt(): Carbon
+    public function getOccurredAt(): CarbonImmutable
     {
         return $this->occurredAt;
     }

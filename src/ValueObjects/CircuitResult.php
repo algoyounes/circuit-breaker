@@ -6,7 +6,10 @@ use AlgoYounes\CircuitBreaker\Enums\CircuitStatus;
 use AlgoYounes\CircuitBreaker\Exceptions\CircuitAlreadyOpenedException;
 use Throwable;
 
-readonly class Packet
+/**
+ * @property CircuitStatus $status Circuit state at the time of execution
+ */
+readonly class CircuitResult
 {
     public function __construct(
         public bool $isSuccess,

@@ -1,13 +1,13 @@
 <?php
 
-use AlgoYounes\CircuitBreaker\ValueObjects\Packet;
+use AlgoYounes\CircuitBreaker\ValueObjects\CircuitResult;
 
 it('returns success packet when circuit is closed and operation succeeds', function () {
     $operation = fn () => 'payment processed';
 
     $result = $this->circuitManager->run('payment-service', $operation);
 
-    expect($result)->toBeInstanceOf(Packet::class)
+    expect($result)->toBeInstanceOf(CircuitResult::class)
         ->and($result->isSuccess())->toBeTrue()
         ->and($result->getResult())->toBe('payment processed');
 });
@@ -17,7 +17,7 @@ it('returns failure packet when circuit is closed and operation fails', function
 
     $result = $this->circuitManager->run('payment-service', $operation);
 
-    expect($result)->toBeInstanceOf(Packet::class)
+    expect($result)->toBeInstanceOf(CircuitResult::class)
         ->and($result->isSuccess())->toBeFalse()
         ->and($result->getErrorMessage())->toBe('Payment service is down');
 });
@@ -30,7 +30,7 @@ it('returns success packet when circuit is half-open and operation succeeds', fu
 
     $result = $this->circuitManager->run('payment-service', $operation);
 
-    expect($result)->toBeInstanceOf(Packet::class)
+    expect($result)->toBeInstanceOf(CircuitResult::class)
         ->and($result->isSuccess())->toBeTrue()
         ->and($result->getResult())->toBe('payment processed');
 });
@@ -43,7 +43,7 @@ it('returns failure packet when circuit is half-open and operation fails', funct
 
     $result = $this->circuitManager->run('payment-service', $operation);
 
-    expect($result)->toBeInstanceOf(Packet::class)
+    expect($result)->toBeInstanceOf(CircuitResult::class)
         ->and($result->isSuccess())->toBeFalse()
         ->and($result->getErrorMessage())->toBe('Payment service is down');
 });

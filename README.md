@@ -1,5 +1,5 @@
 <p align="center">
-<img style="border-radius: 5px; max-width: 100%;" src="assets/logo.jpeg" alt="Circuit Breaker Logo"/>
+<img style="border-radius: 5px; max-width: 100%;" src="assets/logo.png" alt="Circuit Breaker Logo"/>
 </p>
 <p align="center">
 <a href="https://github.com/algoyounes/circuit-breaker/actions"><img src="https://github.com/algoyounes/circuit-breaker/actions/workflows/unit-tests.yml/badge.svg" alt="Build Status"></a>
@@ -47,24 +47,24 @@ $circuit = $this->circuitManager->forService('service-name');
 ### Custom Callbacks
 You can define callbacks for key circuit states:
 
-| Callback        | Description                                                                               | Parameters Received        |
-|-----------------|-------------------------------------------------------------------------------------------|----------------------------| 
-| `onOpen`        | Triggered when the circuit goes into **OPEN**, blocking calls to prevent further failures | `CircuitContext`           |
-| `onHalfOpen`    | The circuit enters **HALF-OPEN** to test stability, letting a few requests through        | `CircuitContext`           |
-| `onClose`       | The circuit returns to **CLOSED**, allowing all requests without restrictions             | `CircuitContext`           |
-| `onSuccess`     | Fires when a request succeeds, indicating system availability                             | `Packet`, `CircuitContext` |
-| `onFailure`     | Triggered when a request fails, potentially opening the circuit                           | `Packet`, `CircuitContext` |
-| `onSteadyState` | Indicates the circuit is stable, with no need for changes                                 | `CircuitContext`           |
+| Callback        | Description                                                                               | Parameters Received                  |
+|-----------------|-------------------------------------------------------------------------------------------|--------------------------------------| 
+| `onOpen`        | Triggered when the circuit goes into **OPEN**, blocking calls to prevent further failures | `CircuitTransition`                  |
+| `onHalfOpen`    | The circuit enters **HALF-OPEN** to test stability, letting a few requests through        | `CircuitTransition`                  |
+| `onClose`       | The circuit returns to **CLOSED**, allowing all requests without restrictions             | `CircuitTransition`                  |
+| `onSuccess`     | Fires when a request succeeds, indicating system availability                             | `CircuitResult`, `CircuitTransition` |
+| `onFailure`     | Triggered when a request fails, potentially opening the circuit                           | `CircuitResult`, `CircuitTransition` |
+| `onSteadyState` | Indicates the circuit is stable, with no need for changes                                 | `CircuitTransition`                  |
 
 Example of defining callbacks:
 
 ```php
 
-$circuit->onOpen(function (CircuitContext $context) { 
+$circuit->onOpen(function (CircuitTransition $circuitTransition) { 
     // Your custom logic here
 });
 
-$circuit->onSuccess(function (Packet $packet, CircuitContext $context) {
+$circuit->onSuccess(function (CircuitResult $circuitResult, CircuitTransition $circuitTransition) {
     // Your custom logic here
 });
 

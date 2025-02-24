@@ -19,8 +19,8 @@ class CircuitStateCacheManager implements StateManagerContract
     private const SUCCESS_SUFFIX = 'success';
 
     public function __construct(
-        private readonly CacheRepository $cache,
-        private readonly CircuitBreakerConfig $config
+        private readonly CircuitBreakerConfig $config,
+        private readonly CacheRepository $cache
     ) {}
 
     private function getCacheKey(string $circuitKey, string $suffix): string

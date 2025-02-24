@@ -49,7 +49,7 @@ class CircuitBreakerServiceProvider extends ServiceProvider
                 $config = $this->getConfig();
                 $cache = $this->getCacheRepository($app);
 
-                return new CircuitStateCacheManager($cache, $config);
+                return new CircuitStateCacheManager($config, $cache);
             }
         );
     }
