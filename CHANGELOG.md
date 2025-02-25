@@ -2,6 +2,17 @@
 
 All notable changes to `laravel circuit breaker` will be documented in this file
 
+## v1.0.4 - 2025-02-25
+
+### What's Changed
+
+* Builder State Tracking > Added internal context passing to callbacks for improved state management
+* Equality Checks > Enabled equality comparisons across core components
+* Value Objects > Unified implementations for consistency and maintainability
+* Config Cleanup
+
+**Full Changelog**: https://github.com/algoyounes/circuit-breaker/compare/v1.0.3...v1.0.4
+
 ## v1.0.3 - 2025-02-17
 
 ### What's Changed
