@@ -24,8 +24,6 @@ class CircuitBreakerConfig
         ServiceConfig::FAILURE_THRESHOLD_KEY => 5,
         ServiceConfig::COOLDOWN_PERIOD_KEY   => 60,
         ServiceConfig::SUCCESS_THRESHOLD_KEY => 1,
-        ServiceConfig::FAILURE_WINDOW_KEY    => 30,
-        ServiceConfig::SUCCESS_WINDOW_KEY    => 15,
     ];
 
     public function __construct(

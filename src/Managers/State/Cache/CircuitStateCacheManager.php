@@ -89,6 +89,7 @@ class CircuitStateCacheManager implements StateManagerContract
             CircuitStatus::HALF_OPEN->value
         );
 
+        $this->cache->forget($this->getCacheKey($service, self::COOLDOWN_END_SUFFIX));
         $this->resetCounters($service);
     }
 

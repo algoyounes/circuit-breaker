@@ -37,8 +37,6 @@ return [
         'failure_threshold' => 5,  // Number of failures before opening the circuit
         'cooldown_period'   => 60, // Time in seconds before attempting to half-open the circuit
         'success_threshold' => 1, // Number of successes required to close the circuit
-        'failure_window'    => 30,   // Time window in seconds to consider for failure threshold
-        'success_window'    => 15,  // Time window in seconds to consider for success threshold
     ],
 
     /*

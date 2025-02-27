@@ -72,3 +72,22 @@ it('closes circuit after successful operation in half-open state', function () {
     // Assert: Circuit should be CLOSED (service available)
     expect($this->circuitManager->isServiceAvailable('payment-service'))->toBeTrue();
 });
+
+it('returns true when circuit is half-open', function () {
+    $this->stateManager->open('payment-service');
+    $this->stateManager->halfOpen('payment-service');
+
+    expect($this->circuitManager->isServiceAvailable('payment-service'))->toBeTrue();
+});
+
+it('returns true only when all services in array are closed', function () {
+    // Service A: CLOSED, Service B: OPEN
+    $this->stateManager->close('service-a');
+    $this->stateManager->open('service-b');
+
+    expect($this->circuitManager->isServiceAvailable(['service-a', 'service-b']))->toBeFalse();
+});
+
+it('returns false for empty service array', function () {
+    expect($this->circuitManager->isServiceAvailable([]))->toBeFalse();
+});

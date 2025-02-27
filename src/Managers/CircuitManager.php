@@ -35,6 +35,10 @@ class CircuitManager
             return $this->getStatus($services)->notEquals(CircuitStatus::OPEN);
         }
 
+        if ($services === []) {
+            return false;
+        }
+
         foreach ($services as $service) {
             if ($this->getStatus($service)->equals(CircuitStatus::OPEN)) {
                 return false;
