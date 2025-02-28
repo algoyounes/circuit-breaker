@@ -58,7 +58,7 @@ class CircuitStateCacheManager implements StateManagerContract
         $cooldownPeriod = max(1, $serviceConfig->getCooldownPeriod());
         $currentStatus = $this->getStatus($service);
 
-        if ($currentStatus !== CircuitStatus::OPEN) {
+        if ($currentStatus->notEquals(CircuitStatus::OPEN)) {
             $cooldownEnd = Carbon::now()->addSeconds($cooldownPeriod)->getTimestamp();
 
             $this->setWithConfigTtl(
