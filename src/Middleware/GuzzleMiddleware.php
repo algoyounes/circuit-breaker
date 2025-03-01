@@ -3,8 +3,8 @@
 namespace AlgoYounes\CircuitBreaker\Middleware;
 
 use AlgoYounes\CircuitBreaker\Guzzle\Contracts\FailureDetectorContract;
+use AlgoYounes\CircuitBreaker\Guzzle\Contracts\ServiceNameExtractorContract;
 use AlgoYounes\CircuitBreaker\Guzzle\Exceptions\RejectedException;
-use AlgoYounes\CircuitBreaker\Guzzle\ServiceNameExtractor;
 use AlgoYounes\CircuitBreaker\Managers\CircuitManager;
 use Closure;
 use GuzzleHttp\Promise\Create as PromiseCreate;
@@ -14,7 +14,7 @@ class GuzzleMiddleware
 {
     public function __construct(
         private readonly CircuitManager $circuitManager,
-        private readonly ServiceNameExtractor $serviceNameExtractor,
+        private readonly ServiceNameExtractorContract $serviceNameExtractor,
         private readonly FailureDetectorContract $failureDetector
     ) {}
 

@@ -4,6 +4,10 @@ namespace AlgoYounes\CircuitBreaker\Providers;
 
 use AlgoYounes\CircuitBreaker\Config\CircuitBreakerConfig;
 use AlgoYounes\CircuitBreaker\Contracts\StateManagerContract;
+use AlgoYounes\CircuitBreaker\Guzzle\Contracts\FailureDetectorContract;
+use AlgoYounes\CircuitBreaker\Guzzle\Contracts\ServiceNameExtractorContract;
+use AlgoYounes\CircuitBreaker\Guzzle\DefaultFailureDetector;
+use AlgoYounes\CircuitBreaker\Guzzle\ServiceNameExtractor;
 use AlgoYounes\CircuitBreaker\Managers\State\Cache\CircuitStateCacheManager;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
@@ -52,6 +56,9 @@ class CircuitBreakerServiceProvider extends ServiceProvider
                 return new CircuitStateCacheManager($config, $cache);
             }
         );
+
+        $this->app->bind(ServiceNameExtractorContract::class, ServiceNameExtractor::class);
+        $this->app->bind(FailureDetectorContract::class, DefaultFailureDetector::class);
     }
 
     private function getCacheRepository(Application $app): CacheRepository
