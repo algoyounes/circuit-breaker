@@ -48,6 +48,16 @@ class CircuitManager
         return true;
     }
 
+    public function recordSuccess(string $service): void
+    {
+        $this->stateManager->recordSuccess($service);
+    }
+
+    public function recordFailure(string $service): void
+    {
+        $this->stateManager->recordFailure($service);
+    }
+
     public function run(string $service, callable $operation): CircuitResult
     {
         if ($this->config->isNotEnabled()) {
