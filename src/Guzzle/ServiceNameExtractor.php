@@ -2,6 +2,7 @@
 
 namespace AlgoYounes\CircuitBreaker\Guzzle;
 
+use AlgoYounes\CircuitBreaker\Guzzle\Contracts\ServiceNameExtractorContract;
 use Psr\Http\Message\RequestInterface;
 
 class ServiceNameExtractor implements ServiceNameExtractorContract

@@ -2,6 +2,7 @@
 
 namespace AlgoYounes\CircuitBreaker\Guzzle;
 
+use AlgoYounes\CircuitBreaker\Guzzle\Contracts\FailureDetectorContract;
 use Psr\Http\Message\ResponseInterface;
 
 class DefaultFailureDetector implements FailureDetectorContract

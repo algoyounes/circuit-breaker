@@ -2,8 +2,8 @@
 
 namespace AlgoYounes\CircuitBreaker\Middleware;
 
+use AlgoYounes\CircuitBreaker\Guzzle\Contracts\FailureDetectorContract;
 use AlgoYounes\CircuitBreaker\Guzzle\Exceptions\RejectedException;
-use AlgoYounes\CircuitBreaker\Guzzle\FailureDetectorContract;
 use AlgoYounes\CircuitBreaker\Guzzle\ServiceNameExtractor;
 use AlgoYounes\CircuitBreaker\Managers\CircuitManager;
 use Closure;
@@ -34,9 +34,11 @@ class GuzzleMiddleware
                 function ($response) use ($serviceName) {
                     if ($this->failureDetector->isFailureResponse($response)) {
                         $this->circuitManager->recordFailure($serviceName);
-                    } else {
-                        $this->circuitManager->recordSuccess($serviceName);
+
+                        return PromiseCreate::promiseFor($response);
                     }
+
+                    $this->circuitManager->recordSuccess($serviceName);
 
                     return PromiseCreate::promiseFor($response);
                 },

@@ -1,6 +1,6 @@
 <?php
 
-namespace AlgoYounes\CircuitBreaker\Guzzle;
+namespace AlgoYounes\CircuitBreaker\Guzzle\Contracts;
 
 use Psr\Http\Message\ResponseInterface;
 
