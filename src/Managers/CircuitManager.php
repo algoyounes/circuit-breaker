@@ -29,7 +29,7 @@ class CircuitManager
     /**
      * @param  string|array<string>  $services
      */
-    public function isServiceAvailable(string|array $services): bool
+    public function isAvailable(string|array $services): bool
     {
         if (is_string($services)) {
             return $this->getStatus($services)->notEquals(CircuitStatus::OPEN);

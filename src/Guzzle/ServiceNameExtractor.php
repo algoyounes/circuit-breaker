@@ -8,7 +8,7 @@ use Psr\Http\Message\RequestInterface;
 class ServiceNameExtractor implements ServiceNameExtractorContract
 {
     private const OPTION_KEY = 'circuit-breaker.service_name';
-    private const HEADER_NAME = 'X-Circuit-Service-Name';
+    private const HEADER_NAME = 'X-Circuit-Key';
 
     public function extract(RequestInterface $request, array $requestOptions): string
     {

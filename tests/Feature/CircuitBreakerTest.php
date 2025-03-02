@@ -59,7 +59,7 @@ it('opens circuit after exceeding failure threshold', function () {
     $result = $this->circuitManager->run('payment-service', fn () => 'ignored');
 
     expect($result->isSuccess())->toBeFalse()
-        ->and($this->circuitManager->isServiceAvailable('payment-service'))->toBeFalse();
+        ->and($this->circuitManager->isAvailable('payment-service'))->toBeFalse();
 });
 
 it('closes circuit after successful operation in half-open state', function () {
@@ -70,14 +70,14 @@ it('closes circuit after successful operation in half-open state', function () {
     $this->circuitManager->run('payment-service', fn () => 'success');
 
     // Assert: Circuit should be CLOSED (service available)
-    expect($this->circuitManager->isServiceAvailable('payment-service'))->toBeTrue();
+    expect($this->circuitManager->isAvailable('payment-service'))->toBeTrue();
 });
 
 it('returns true when circuit is half-open', function () {
     $this->stateManager->open('payment-service');
     $this->stateManager->halfOpen('payment-service');
 
-    expect($this->circuitManager->isServiceAvailable('payment-service'))->toBeTrue();
+    expect($this->circuitManager->isAvailable('payment-service'))->toBeTrue();
 });
 
 it('returns true only when all services in array are closed', function () {
@@ -85,9 +85,9 @@ it('returns true only when all services in array are closed', function () {
     $this->stateManager->close('service-a');
     $this->stateManager->open('service-b');
 
-    expect($this->circuitManager->isServiceAvailable(['service-a', 'service-b']))->toBeFalse();
+    expect($this->circuitManager->isAvailable(['service-a', 'service-b']))->toBeFalse();
 });
 
 it('returns false for empty service array', function () {
-    expect($this->circuitManager->isServiceAvailable([]))->toBeFalse();
+    expect($this->circuitManager->isAvailable([]))->toBeFalse();
 });

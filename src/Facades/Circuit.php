@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Facade;
 /**
  * @method static CircuitBuilder forService(string $service)
  * @method static CircuitStatus getStatus(string $service)
- * @method static bool isServiceAvailable(string|array $services)
+ * @method static bool isAvailable(string|array $services)
  * @method static CircuitResult run(string $service, callable $operation)
  */
 class Circuit extends Facade

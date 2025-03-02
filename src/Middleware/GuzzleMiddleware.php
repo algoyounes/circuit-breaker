@@ -24,7 +24,7 @@ class GuzzleMiddleware
             $serviceName = $this->serviceNameExtractor->extract($request, $options);
             $promise = $handler($request, $options);
 
-            if (! $this->circuitManager->isServiceAvailable($serviceName)) {
+            if (! $this->circuitManager->isAvailable($serviceName)) {
                 return PromiseCreate::rejectionFor(
                     RejectedException::withServiceName($serviceName)
                 );
