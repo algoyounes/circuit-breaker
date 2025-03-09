@@ -2,6 +2,14 @@
 
 All notable changes to `laravel circuit breaker` will be documented in this file
 
+## v1.1.0 - 2025-03-09
+
+### Changes :
+
+- feat: Add timezone option
+
+**Full Changelog**: https://github.com/algoyounes/circuit-breaker/compare/v1.0.5...v1.1.0
+
 ## v1.0.5 - 2025-02-27
 
 **Full Changelog**: https://github.com/algoyounes/circuit-breaker/compare/v1.0.4...v1.0.5
