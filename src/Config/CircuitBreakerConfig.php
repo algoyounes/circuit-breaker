@@ -8,6 +8,7 @@ class CircuitBreakerConfig
     public const ENABLED_KEY = 'enabled';
     public const DEFAULTS_KEY = 'defaults';
     public const SERVICES_KEY = 'services';
+    public const TIMEZONE_KEY = 'timezone';
 
     // Cache config keys
     public const CACHE_TTL_KEY = 'cache.ttl';
@@ -19,6 +20,7 @@ class CircuitBreakerConfig
     private const DEFAULT_CACHE_TTL = 86400; // 24 hours
     public const DEFAULT_CACHE_STORE = 'default';
     public const DEFAULT_CACHE_PREFIX = 'circuit-breaker';
+    public const DEFAULT_TIMEZONE = 'UTC';
 
     private const DEFAULT_SERVICE_PARAMS = [
         ServiceConfig::FAILURE_THRESHOLD_KEY => 5,
@@ -28,6 +30,7 @@ class CircuitBreakerConfig
 
     public function __construct(
         private readonly bool $enabled,
+        private readonly string $timezone,
         private readonly int $cacheTtl,
         private readonly string $cachePrefix,
         private readonly string $cacheStore,
@@ -60,6 +63,7 @@ class CircuitBreakerConfig
 
         return new self(
             $get(self::ENABLED_KEY, self::DEFAULT_ENABLED),
+            $get(self::TIMEZONE_KEY, self::DEFAULT_TIMEZONE),
             $get(self::CACHE_TTL_KEY, self::DEFAULT_CACHE_TTL),
             $get(self::CACHE_PREFIX_KEY, self::DEFAULT_CACHE_PREFIX),
             $get(self::CACHE_STORE_KEY, self::DEFAULT_CACHE_STORE),
@@ -111,5 +115,10 @@ class CircuitBreakerConfig
     public function getDefaultSettings(): ServiceConfig
     {
         return $this->defaults;
+    }
+
+    public function getTimezone(): string
+    {
+        return $this->timezone;
     }
 }

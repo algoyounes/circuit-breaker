@@ -59,7 +59,7 @@ class CircuitStateCacheManager implements StateManagerContract
         $currentStatus = $this->getStatus($service);
 
         if ($currentStatus->notEquals(CircuitStatus::OPEN)) {
-            $cooldownEnd = Carbon::now()->addSeconds($cooldownPeriod)->getTimestamp();
+            $cooldownEnd = Carbon::now($this->config->getTimezone())->addSeconds($cooldownPeriod)->getTimestamp();
 
             $this->setWithConfigTtl(
                 $this->getCacheKey($service, self::COOLDOWN_END_SUFFIX),
@@ -103,7 +103,8 @@ class CircuitStateCacheManager implements StateManagerContract
             return false;
         }
 
-        return $cooldownEnd && Carbon::now()->lessThan(Carbon::createFromTimestamp($cooldownEnd));
+        return $cooldownEnd && Carbon::now($this->config->getTimezone())
+            ->lessThan(Carbon::createFromTimestamp($cooldownEnd, $this->config->getTimezone()));
     }
 
     public function recordSuccess(string $service): void
