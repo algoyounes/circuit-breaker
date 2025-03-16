@@ -102,6 +102,31 @@ $this->circuitManager->run('service-name', function () {
 $this->circuitManager->run('service-name', $this->serviceName->create(...));
 ```
 
+### Guzzle Middleware Integration
+
+The package provides a Guzzle middleware to automatically manage circuit breaker logic for HTTP requests.
+
+To enable the middleware, add the following to your Guzzle client configuration:
+
+```php
+use AlgoYounes\CircuitBreaker\Middleware\GuzzleMiddleware;
+use GuzzleHttp\Client;
+use GuzzleHttp\HandlerStack;
+
+$stack = HandlerStack::create();
+$stack->push(GuzzleMiddleware::create());
+
+$client = new Client([
+    'handler' => $stack,
+]);
+
+$response = $client->get('https://api.example.com', [
+    'headers' => [
+        'X-Circuit-Key' => 'service-name',
+    ],
+]);
+```
+
 ## Contributing
 
 Thank you for considering contributing to the Circuit Breaker package! Please check the [CONTRIBUTING](CONTRIBUTING.md) file for more details.
