@@ -51,6 +51,10 @@ class CircuitManager
     public function recordSuccess(string $service): void
     {
         $this->stateManager->recordSuccess($service);
+
+        if ($this->stateManager->hasSufficientSuccess($service)) {
+            $this->stateManager->close($service);
+        }
     }
 
     public function recordFailure(string $service): void

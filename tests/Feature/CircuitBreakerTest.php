@@ -1,6 +1,10 @@
 <?php
 
+use AlgoYounes\CircuitBreaker\Guzzle\Exceptions\RejectedException;
+use AlgoYounes\CircuitBreaker\Middleware\GuzzleMiddleware;
 use AlgoYounes\CircuitBreaker\ValueObjects\CircuitResult;
+use GuzzleHttp\Client;
+use GuzzleHttp\HandlerStack;
 
 it('returns success packet when circuit is closed and operation succeeds', function () {
     $operation = fn () => 'payment processed';
@@ -90,4 +94,32 @@ it('returns true only when all services in array are closed', function () {
 
 it('returns false for empty service array', function () {
     expect($this->circuitManager->isAvailable([]))->toBeFalse();
+});
+
+it('ensures circuit remains available after Guzzle request', function () {
+    $handlers = HandlerStack::create();
+    $handlers->push(GuzzleMiddleware::create());
+
+    $client = new Client(['handler' => $handlers]);
+
+    $client->get('http://example.com', [
+        'headers' => ['X-Circuit-Key' => 'payment-service'],
+    ]);
+
+    expect($this->circuitManager->isAvailable('payment-service'))->toBeTrue();
+});
+
+it('throws RejectedException when circuit is open for request', function () {
+    $this->expectException(RejectedException::class);
+
+    $this->stateManager->open('payment-service');
+
+    $handlers = HandlerStack::create();
+    $handlers->push(GuzzleMiddleware::create());
+
+    $client = new Client(['handler' => $handlers]);
+
+    $client->get('http://example.com', [
+        'headers' => ['X-Circuit-Key' => 'payment-service'],
+    ]);
 });
