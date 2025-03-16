@@ -48,6 +48,11 @@ readonly class CircuitResult
         return $this->status;
     }
 
+    public function isAvailable(): bool
+    {
+        return $this->status->notEquals(CircuitStatus::OPEN);
+    }
+
     public static function success(mixed $result): self
     {
         return new self(

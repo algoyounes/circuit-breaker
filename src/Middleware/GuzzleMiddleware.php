@@ -1,0 +1,69 @@
+<?php
+
+namespace AlgoYounes\CircuitBreaker\Middleware;
+
+use AlgoYounes\CircuitBreaker\Guzzle\Contracts\FailureDetectorContract;
+use AlgoYounes\CircuitBreaker\Guzzle\Contracts\ServiceNameExtractorContract;
+use AlgoYounes\CircuitBreaker\Guzzle\DefaultFailureDetector;
+use AlgoYounes\CircuitBreaker\Guzzle\Exceptions\RejectedException;
+use AlgoYounes\CircuitBreaker\Guzzle\ServiceNameExtractor;
+use AlgoYounes\CircuitBreaker\Managers\CircuitManager;
+use Closure;
+use GuzzleHttp\Promise\Create as PromiseCreate;
+use Psr\Http\Message\RequestInterface;
+
+class GuzzleMiddleware
+{
+    private readonly CircuitManager $circuitManager;
+    private readonly ServiceNameExtractorContract $serviceNameExtractor;
+    private readonly FailureDetectorContract $failureDetector;
+
+    public function __construct(
+        ?ServiceNameExtractorContract $serviceNameExtractor = null,
+        ?FailureDetectorContract $failureDetector = null
+    ) {
+        $this->circuitManager = app(CircuitManager::class);
+        $this->serviceNameExtractor = $serviceNameExtractor ?: new ServiceNameExtractor;
+        $this->failureDetector = $failureDetector ?: new DefaultFailureDetector;
+    }
+
+    public static function create(
+        ?ServiceNameExtractorContract $serviceNameExtractor = null,
+        ?FailureDetectorContract $failureDetector = null
+    ): self {
+        return new self($serviceNameExtractor, $failureDetector);
+    }
+
+    public function __invoke(callable $handler): Closure
+    {
+        return function (RequestInterface $request, array $options) use ($handler) {
+            $serviceName = $this->serviceNameExtractor->extract($request, $options);
+            $promise = $handler($request, $options);
+
+            if (! $this->circuitManager->isAvailable($serviceName)) {
+                return PromiseCreate::rejectionFor(
+                    RejectedException::withServiceName($serviceName)
+                );
+            }
+
+            return $promise->then(
+                function ($response) use ($serviceName) {
+                    if ($this->failureDetector->isFailureResponse($response)) {
+                        $this->circuitManager->recordFailure($serviceName);
+
+                        return PromiseCreate::promiseFor($response);
+                    }
+
+                    $this->circuitManager->recordSuccess($serviceName);
+
+                    return PromiseCreate::promiseFor($response);
+                },
+                function ($reason) use ($serviceName) {
+                    $this->circuitManager->recordFailure($serviceName);
+
+                    return PromiseCreate::rejectionFor($reason);
+                }
+            );
+        };
+    }
+}

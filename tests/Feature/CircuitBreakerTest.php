@@ -1,6 +1,10 @@
 <?php
 
+use AlgoYounes\CircuitBreaker\Guzzle\Exceptions\RejectedException;
+use AlgoYounes\CircuitBreaker\Middleware\GuzzleMiddleware;
 use AlgoYounes\CircuitBreaker\ValueObjects\CircuitResult;
+use GuzzleHttp\Client;
+use GuzzleHttp\HandlerStack;
 
 it('returns success packet when circuit is closed and operation succeeds', function () {
     $operation = fn () => 'payment processed';
@@ -59,7 +63,7 @@ it('opens circuit after exceeding failure threshold', function () {
     $result = $this->circuitManager->run('payment-service', fn () => 'ignored');
 
     expect($result->isSuccess())->toBeFalse()
-        ->and($this->circuitManager->isServiceAvailable('payment-service'))->toBeFalse();
+        ->and($this->circuitManager->isAvailable('payment-service'))->toBeFalse();
 });
 
 it('closes circuit after successful operation in half-open state', function () {
@@ -70,14 +74,14 @@ it('closes circuit after successful operation in half-open state', function () {
     $this->circuitManager->run('payment-service', fn () => 'success');
 
     // Assert: Circuit should be CLOSED (service available)
-    expect($this->circuitManager->isServiceAvailable('payment-service'))->toBeTrue();
+    expect($this->circuitManager->isAvailable('payment-service'))->toBeTrue();
 });
 
 it('returns true when circuit is half-open', function () {
     $this->stateManager->open('payment-service');
     $this->stateManager->halfOpen('payment-service');
 
-    expect($this->circuitManager->isServiceAvailable('payment-service'))->toBeTrue();
+    expect($this->circuitManager->isAvailable('payment-service'))->toBeTrue();
 });
 
 it('returns true only when all services in array are closed', function () {
@@ -85,9 +89,37 @@ it('returns true only when all services in array are closed', function () {
     $this->stateManager->close('service-a');
     $this->stateManager->open('service-b');
 
-    expect($this->circuitManager->isServiceAvailable(['service-a', 'service-b']))->toBeFalse();
+    expect($this->circuitManager->isAvailable(['service-a', 'service-b']))->toBeFalse();
 });
 
 it('returns false for empty service array', function () {
-    expect($this->circuitManager->isServiceAvailable([]))->toBeFalse();
+    expect($this->circuitManager->isAvailable([]))->toBeFalse();
+});
+
+it('ensures circuit remains available after Guzzle request', function () {
+    $handlers = HandlerStack::create();
+    $handlers->push(GuzzleMiddleware::create());
+
+    $client = new Client(['handler' => $handlers]);
+
+    $client->get('http://example.com', [
+        'headers' => ['X-Circuit-Key' => 'payment-service'],
+    ]);
+
+    expect($this->circuitManager->isAvailable('payment-service'))->toBeTrue();
+});
+
+it('throws RejectedException when circuit is open for request', function () {
+    $this->expectException(RejectedException::class);
+
+    $this->stateManager->open('payment-service');
+
+    $handlers = HandlerStack::create();
+    $handlers->push(GuzzleMiddleware::create());
+
+    $client = new Client(['handler' => $handlers]);
+
+    $client->get('http://example.com', [
+        'headers' => ['X-Circuit-Key' => 'payment-service'],
+    ]);
 });

@@ -29,7 +29,7 @@ class CircuitManager
     /**
      * @param  string|array<string>  $services
      */
-    public function isServiceAvailable(string|array $services): bool
+    public function isAvailable(string|array $services): bool
     {
         if (is_string($services)) {
             return $this->getStatus($services)->notEquals(CircuitStatus::OPEN);
@@ -46,6 +46,20 @@ class CircuitManager
         }
 
         return true;
+    }
+
+    public function recordSuccess(string $service): void
+    {
+        $this->stateManager->recordSuccess($service);
+
+        if ($this->stateManager->hasSufficientSuccess($service)) {
+            $this->stateManager->close($service);
+        }
+    }
+
+    public function recordFailure(string $service): void
+    {
+        $this->stateManager->recordFailure($service);
     }
 
     public function run(string $service, callable $operation): CircuitResult
