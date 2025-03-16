@@ -2,6 +2,14 @@
 
 All notable changes to `laravel circuit breaker` will be documented in this file
 
+## v1.2.0 - 2025-03-16
+
+### What's Changed
+
+* Feat: Guzzle Http Request Support  by @algoyounes in https://github.com/algoyounes/circuit-breaker/pull/4
+
+**Full Changelog**: https://github.com/algoyounes/circuit-breaker/compare/v1.1.0...v1.2.0
+
 ## v1.1.0 - 2025-03-09
 
 ### Changes :
