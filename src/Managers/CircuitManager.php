@@ -27,7 +27,16 @@ class CircuitManager
     }
 
     /**
+     * Check if the service is available based on its circuit breaker status:
+     *  - `OPEN`: Service is unavailable (returns `false`)
+     *  - `HALF_OPEN`/`CLOSED`: Service is available (returns `true`)
+     *
      * @param  string|array<string>  $services
+     *
+     * @example
+     *  isAvailable('payment-service')               // True if payment is CLOSED/HALF_OPEN
+     *  isAvailable(['api-service', 'email-service') // True if both are CLOSED/HALF_OPEN
+     *  isAvailable([])                              // False (explicit empty array case)
      */
     public function isAvailable(string|array $services): bool
     {
