@@ -21,9 +21,11 @@ class CircuitBreakerServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        $this->publishes([
-            dirname(__DIR__, 2).'/config/circuit-breaker.php' => config_path('circuit-breaker.php'),
-        ], 'config');
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                dirname(__DIR__, 2).'/config/circuit-breaker.php' => config_path('circuit-breaker.php'),
+            ], 'config');
+        }
     }
 
     public function register(): void
