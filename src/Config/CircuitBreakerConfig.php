@@ -6,20 +6,13 @@ class CircuitBreakerConfig
 {
     // Config keys
     public const ENABLED_KEY = 'enabled';
+    public const TIMEZONE_KEY = 'timezone';
     public const DEFAULTS_KEY = 'defaults';
     public const SERVICES_KEY = 'services';
-    public const TIMEZONE_KEY = 'timezone';
-
-    // Cache config keys
-    public const CACHE_TTL_KEY = 'cache.ttl';
-    public const CACHE_PREFIX_KEY = 'cache.prefix';
-    public const CACHE_STORE_KEY = 'cache.store';
+    public const CACHE_KEY = 'cache';
 
     // Default values
     private const DEFAULT_ENABLED = true;
-    private const DEFAULT_CACHE_TTL = 86400; // 24 hours
-    public const DEFAULT_CACHE_STORE = 'default';
-    public const DEFAULT_CACHE_PREFIX = 'circuit-breaker';
     public const DEFAULT_TIMEZONE = 'UTC';
 
     private const DEFAULT_SERVICE_PARAMS = [
@@ -31,30 +24,37 @@ class CircuitBreakerConfig
     public function __construct(
         private readonly bool $enabled,
         private readonly string $timezone,
-        private readonly int $cacheTtl,
-        private readonly string $cachePrefix,
-        private readonly string $cacheStore,
+        private readonly CacheConfig $cacheConfig,
         private readonly ServiceConfig $defaults,
         /** @var array<string, array<string, int>> $services */
         private readonly array $services
     ) {}
 
-    // @phpstan-ignore-next-line
+    /**
+     * @param array{
+     *   enabled?: bool,
+     *   timezone?: string,
+     *   cache?: array{ttl?: int, prefix?: string, store?: string},
+     *   defaults?: array{
+     *     failure_threshold?: int,
+     *     cooldown_period?: int,
+     *     success_threshold?: int
+     *   },
+     *   services?: array<string, array<string, int>>
+     * } $attributes
+     */
     public static function createFromArray(array $attributes): self
     {
-        $get = static fn (string $key, int|bool|string|array|null $default = null) => $attributes[$key] ?? $default;
-
         $defaultSettings = ServiceConfig::fromArray(
             array_merge(
                 self::DEFAULT_SERVICE_PARAMS,
-                array_intersect_key($get(self::DEFAULTS_KEY, []), self::DEFAULT_SERVICE_PARAMS)
+                array_intersect_key($attributes[self::DEFAULTS_KEY] ?? [], self::DEFAULT_SERVICE_PARAMS)
             )
         );
 
-        /** @var array<string, array<string, int>> $rawServices */
-        $rawServices = $get(self::SERVICES_KEY, []);
-
         $services = [];
+        $rawServices = $attributes[self::SERVICES_KEY] ?? [];
+
         foreach ($rawServices as $serviceName => $serviceConfig) {
             $filteredConfig = array_intersect_key($serviceConfig, self::DEFAULT_SERVICE_PARAMS);
 
@@ -62,13 +62,11 @@ class CircuitBreakerConfig
         }
 
         return new self(
-            $get(self::ENABLED_KEY, self::DEFAULT_ENABLED),
-            $get(self::TIMEZONE_KEY, self::DEFAULT_TIMEZONE),
-            $get(self::CACHE_TTL_KEY, self::DEFAULT_CACHE_TTL),
-            $get(self::CACHE_PREFIX_KEY, self::DEFAULT_CACHE_PREFIX),
-            $get(self::CACHE_STORE_KEY, self::DEFAULT_CACHE_STORE),
-            $defaultSettings,
-            $services,
+            enabled: $attributes[self::ENABLED_KEY] ?? self::DEFAULT_ENABLED,
+            timezone: $attributes[self::TIMEZONE_KEY] ?? self::DEFAULT_TIMEZONE,
+            cacheConfig: CacheConfig::fromArray($attributes[self::CACHE_KEY] ?? []),
+            defaults: $defaultSettings,
+            services: $services,
         );
     }
 
@@ -92,24 +90,24 @@ class CircuitBreakerConfig
         return $this->isEnabled() === false;
     }
 
-    public function getCacheTtl(int $default = self::DEFAULT_CACHE_TTL): int
+    public function getCacheTtl(int $default = CacheConfig::DEFAULT_TTL): int
     {
-        return $this->cacheTtl ?? $default;
+        return $this->cacheConfig->getTtl($default);
     }
 
     public function getCacheStore(): string
     {
-        return $this->cacheStore;
+        return $this->cacheConfig->getStore();
     }
 
     public function isDefaultCacheStore(): bool
     {
-        return $this->getCacheStore() === self::DEFAULT_CACHE_STORE;
+        return $this->cacheConfig->isDefaultCacheStore();
     }
 
     public function getCachePrefix(): string
     {
-        return $this->cachePrefix;
+        return $this->cacheConfig->getPrefix();
     }
 
     public function getDefaultSettings(): ServiceConfig

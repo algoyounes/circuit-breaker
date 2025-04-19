@@ -10,10 +10,14 @@ class ServiceNameExtractor implements ServiceNameExtractorContract
     private const OPTION_KEY = 'circuit-breaker.service_name';
     private const HEADER_NAME = 'X-Circuit-Key';
 
+    /**
+     * @param  array<string, mixed>  $requestOptions
+     */
     public function extract(RequestInterface $request, array $requestOptions): string
     {
-        if (array_key_exists(self::OPTION_KEY, $requestOptions)) {
-            return $requestOptions[self::OPTION_KEY];
+        $value = $requestOptions[self::OPTION_KEY] ?? null;
+        if (is_string($value)) {
+            return $value;
         }
 
         $header = $request->getHeader(self::HEADER_NAME);
