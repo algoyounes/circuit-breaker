@@ -4,6 +4,9 @@ namespace AlgoYounes\CircuitBreaker\Config;
 
 use Illuminate\Contracts\Support\Arrayable;
 
+/**
+ * @implements Arrayable<string, int>
+ */
 readonly class ServiceConfig implements Arrayable
 {
     // Service parameter keys
@@ -44,6 +47,9 @@ readonly class ServiceConfig implements Arrayable
         );
     }
 
+    /**
+     * @return array<string, int>
+     */
     public function toArray(): array
     {
         return [

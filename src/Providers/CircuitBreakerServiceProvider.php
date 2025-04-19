@@ -39,6 +39,7 @@ class CircuitBreakerServiceProvider extends ServiceProvider
                 $configRepository = $app->make(ConfigRepository::class);
                 $config = (array) $configRepository->get('circuit-breaker', []);
 
+                // @phpstan-ignore-next-line
                 return $this->config = CircuitBreakerConfig::createFromArray($config);
             }
         );

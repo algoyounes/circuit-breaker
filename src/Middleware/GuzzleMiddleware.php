@@ -10,7 +10,9 @@ use AlgoYounes\CircuitBreaker\Guzzle\ServiceNameExtractor;
 use AlgoYounes\CircuitBreaker\Managers\CircuitManager;
 use Closure;
 use GuzzleHttp\Promise\Create as PromiseCreate;
+use GuzzleHttp\Promise\PromiseInterface;
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
 class GuzzleMiddleware
 {
@@ -34,9 +36,21 @@ class GuzzleMiddleware
         return new self($serviceNameExtractor, $failureDetector);
     }
 
+    /**
+     * @param  callable(RequestInterface, array<string, mixed>): PromiseInterface  $handler
+     *
+     * @return Closure(RequestInterface, array<string, mixed>): PromiseInterface
+     */
     public function __invoke(callable $handler): Closure
     {
-        return function (RequestInterface $request, array $options) use ($handler) {
+        /**
+         * @param  RequestInterface  $request
+         * @param  array<string, mixed>  $options
+         *
+         * @return PromiseInterface
+         */
+        return function (RequestInterface $request, array $options) use ($handler): PromiseInterface {
+            /** @var array<string,mixed> $options */
             $serviceName = $this->serviceNameExtractor->extract($request, $options);
             $promise = $handler($request, $options);
 
@@ -47,7 +61,7 @@ class GuzzleMiddleware
             }
 
             return $promise->then(
-                function ($response) use ($serviceName) {
+                function (ResponseInterface $response) use ($serviceName): PromiseInterface {
                     if ($this->failureDetector->isFailureResponse($response)) {
                         $this->circuitManager->recordFailure($serviceName);
 
@@ -58,7 +72,7 @@ class GuzzleMiddleware
 
                     return PromiseCreate::promiseFor($response);
                 },
-                function ($reason) use ($serviceName) {
+                function (mixed $reason) use ($serviceName): PromiseInterface {
                     $this->circuitManager->recordFailure($serviceName);
 
                     return PromiseCreate::rejectionFor($reason);
