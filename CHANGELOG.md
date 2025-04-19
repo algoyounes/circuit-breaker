@@ -2,6 +2,14 @@
 
 All notable changes to `laravel circuit breaker` will be documented in this file
 
+## v1.3.0 - 2025-04-19
+
+### What's Changed
+
+* feat: Add Support for PHP8.4 by @algoyounes in https://github.com/algoyounes/circuit-breaker/pull/5
+
+**Full Changelog**: https://github.com/algoyounes/circuit-breaker/compare/v1.2.1...v1.3.0
+
 ## v1.2.0 - 2025-03-16
 
 ### What's Changed
