@@ -147,3 +147,32 @@ it('rejected exception factory sets message and service name correctly', functio
     expect($ex->getMessage())->toBe('"payment-service" is not available')
         ->and($ex->serviceName())->toBe('payment-service');
 });
+
+it('short-circuits without invoking the handler when circuit is open', function () {
+    $this->stateManager->open('payment-service');
+
+    $invoked = false;
+
+    $baseHandler = function ($request, array $options) use (&$invoked) {
+        $invoked = true;
+
+        return \GuzzleHttp\Promise\Create::promiseFor(new \GuzzleHttp\Psr7\Response(200));
+    };
+
+    $stack = new HandlerStack($baseHandler);
+    $stack->push(GuzzleMiddleware::create());
+
+    $client = new Client(['handler' => $stack]);
+
+    try {
+        $client->get('http://example.com', [
+            'headers' => ['X-Circuit-Key' => 'payment-service'],
+        ]);
+        // If we got here, the middleware did not short-circuit
+        expect()->fail('Expected RejectedException to be thrown');
+    } catch (RejectedException $e) {
+        // Expected
+    }
+
+    expect($invoked)->toBeFalse();
+});

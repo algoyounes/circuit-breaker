@@ -52,13 +52,14 @@ class GuzzleMiddleware
         return function (RequestInterface $request, array $options) use ($handler): PromiseInterface {
             /** @var array<string,mixed> $options */
             $serviceName = $this->serviceNameExtractor->extract($request, $options);
-            $promise = $handler($request, $options);
 
             if (! $this->circuitManager->isAvailable($serviceName)) {
                 return PromiseCreate::rejectionFor(
                     RejectedException::withServiceName($serviceName)
                 );
             }
+
+            $promise = $handler($request, $options);
 
             return $promise->then(
                 function (ResponseInterface $response) use ($serviceName): PromiseInterface {
