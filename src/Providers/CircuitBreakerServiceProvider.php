@@ -48,8 +48,6 @@ class CircuitBreakerServiceProvider extends ServiceProvider
             return;
         }
 
-        $this->app->bind(CacheRepository::class, fn (Application $app): CacheRepository => $this->getCacheRepository($app));
-
         $this->app->singleton(
             StateManagerContract::class,
             function (Application $app): StateManagerContract {
