@@ -87,6 +87,7 @@ class CircuitManager
         // Transition to half-open if the status is OPEN and not in cooldown
         if ($status->equals(CircuitStatus::OPEN)) {
             $this->stateManager->halfOpen($service);
+            $status = CircuitStatus::HALF_OPEN;
         }
 
         try {

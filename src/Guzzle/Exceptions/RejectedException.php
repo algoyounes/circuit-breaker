@@ -15,7 +15,7 @@ class RejectedException extends \RuntimeException
 
     public static function withServiceName(string $serviceName): self
     {
-        return new self(sprintf('"%s" is not available', $serviceName), $serviceName);
+        return new self($serviceName, sprintf('"%s" is not available', $serviceName));
     }
 
     public function serviceName(): string

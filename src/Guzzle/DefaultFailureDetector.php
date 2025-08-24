@@ -9,6 +9,8 @@ class DefaultFailureDetector implements FailureDetectorContract
 {
     public function isFailureResponse(ResponseInterface $response): bool
     {
-        return false;
+        $code = $response->getStatusCode();
+
+        return $code >= 500 || $code === 429;
     }
 }

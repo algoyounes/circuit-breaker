@@ -123,3 +123,27 @@ it('throws RejectedException when circuit is open for request', function () {
         'headers' => ['X-Circuit-Key' => 'payment-service'],
     ]);
 });
+
+it('closes circuit after cooldown elapsed and successful probe', function () {
+    // Arrange: Open circuit and simulate cooldown period has elapsed using Carbon::setTestNow
+    $this->stateManager->open('payment-service');
+
+    \Carbon\Carbon::setTestNow(\Carbon\Carbon::now()->addSeconds(120));
+    try {
+        $result = $this->circuitManager->run('payment-service', fn () => 'ok');
+    } finally {
+        // Reset time travel
+        \Carbon\Carbon::setTestNow();
+    }
+
+    expect($result)->toBeInstanceOf(CircuitResult::class)
+        ->and($result->isSuccess())->toBeTrue()
+        ->and($this->circuitManager->isAvailable('payment-service'))->toBeTrue();
+});
+
+it('rejected exception factory sets message and service name correctly', function () {
+    $ex = RejectedException::withServiceName('payment-service');
+
+    expect($ex->getMessage())->toBe('"payment-service" is not available')
+        ->and($ex->serviceName())->toBe('payment-service');
+});

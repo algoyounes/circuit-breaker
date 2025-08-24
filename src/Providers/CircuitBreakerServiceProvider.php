@@ -50,7 +50,7 @@ class CircuitBreakerServiceProvider extends ServiceProvider
 
         $this->app->bind(CacheRepository::class, fn (Application $app): CacheRepository => $this->getCacheRepository($app));
 
-        $this->app->bind(
+        $this->app->singleton(
             StateManagerContract::class,
             function (Application $app): StateManagerContract {
                 $config = $this->getConfig();
