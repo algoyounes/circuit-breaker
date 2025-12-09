@@ -2,6 +2,15 @@
 
 All notable changes to `laravel circuit breaker` will be documented in this file
 
+## v1.4 - 2025-12-09
+
+### What's Changed
+
+* chore(deps): bump stefanzweifel/git-auto-commit-action from 6 to 7 in https://github.com/algoyounes/circuit-breaker/pull/8
+* chore(deps): bump actions/checkout from 5 to 6 in https://github.com/algoyounes/circuit-breaker/pull/9
+
+**Full Changelog**: https://github.com/algoyounes/circuit-breaker/compare/v1.3.3...v1.4
+
 ## v1.3.0 - 2025-04-19
 
 ### What's Changed
