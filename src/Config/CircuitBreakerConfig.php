@@ -57,8 +57,13 @@ class CircuitBreakerConfig
 
         foreach ($rawServices as $serviceName => $serviceConfig) {
             $filteredConfig = array_intersect_key($serviceConfig, self::DEFAULT_SERVICE_PARAMS);
+            if ($filteredConfig === []) {
+                continue;
+            }
 
-            $services[$serviceName] = array_map('intval', $filteredConfig);
+            foreach ($filteredConfig as $key => $value) {
+                $services[$serviceName][$key] = (int) $value;
+            }
         }
 
         return new self(
