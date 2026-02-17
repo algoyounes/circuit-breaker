@@ -109,13 +109,28 @@ class CircuitStateCacheManager implements StateManagerContract
 
     public function recordSuccess(string $service): void
     {
-        $this->cache->increment($this->getCacheKey($service, self::SUCCESS_SUFFIX));
+        $key = $this->getCacheKey($service, self::SUCCESS_SUFFIX);
+
+        if (! $this->cache->has($key)) {
+            $this->setWithConfigTtl($key, 1);
+        } else {
+            $this->cache->increment($key);
+        }
+
         $this->cache->forget($this->getCacheKey($service, self::FAILURE_SUFFIX));
     }
 
     public function recordFailure(string $service): void
     {
-        $this->cache->increment($this->getCacheKey($service, self::FAILURE_SUFFIX));
+        $key = $this->getCacheKey($service, self::FAILURE_SUFFIX);
+
+        if (! $this->cache->has($key)) {
+            $this->setWithConfigTtl($key, 1);
+
+            return;
+        }
+
+        $this->cache->increment($key);
     }
 
     public function hasExceededThreshold(string $service): bool
