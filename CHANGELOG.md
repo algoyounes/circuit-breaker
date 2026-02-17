@@ -2,6 +2,14 @@
 
 All notable changes to `laravel circuit breaker` will be documented in this file
 
+## v1.5 - 2026-02-17
+
+### What's Changed
+
+* Enhance circuit breaker functionality with Guzzle middleware and add builder pattern tests
+
+**Full Changelog**: https://github.com/algoyounes/circuit-breaker/compare/v1.4...v1.5
+
 ## v1.4 - 2025-12-09
 
 ### What's Changed
