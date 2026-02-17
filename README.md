@@ -17,8 +17,12 @@ The following diagram illustrates how the **Circuit Breaker Pattern** works:
 
 For more info, check the official pattern doc [here](https://learn.microsoft.com/en-us/azure/architecture/patterns/circuit-breaker).
 
-> [!NOTE]
-> This package requires PHP 8.2+ and Laravel 11+ 
+## Prerequisites
+
+This package requires:
+- **PHP 8.2+**
+- **Laravel 11+**
+- **A configured Laravel cache driver**
 
 ## Installation
 
