@@ -2,6 +2,15 @@
 
 All notable changes to `laravel circuit breaker` will be documented in this file
 
+## v1.6 - 2026-03-11
+
+Changes :
+
+- chore(lint): apply code style fixes
+- chore(validation): add validation for service names and configuration values
+
+**Full Changelog**: https://github.com/algoyounes/circuit-breaker/compare/v1.5...v1.6
+
 ## v1.5 - 2026-02-17
 
 ### What's Changed
