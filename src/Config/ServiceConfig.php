@@ -2,6 +2,7 @@
 
 namespace AlgoYounes\CircuitBreaker\Config;
 
+use AlgoYounes\CircuitBreaker\Exceptions\InvalidConfigurationException;
 use Illuminate\Contracts\Support\Arrayable;
 
 /**
@@ -40,10 +41,20 @@ readonly class ServiceConfig implements Arrayable
      */
     public static function fromArray(array $config): self
     {
+        $failureThreshold = $config[self::FAILURE_THRESHOLD_KEY];
+        $cooldownPeriod = $config[self::COOLDOWN_PERIOD_KEY];
+        $successThreshold = $config[self::SUCCESS_THRESHOLD_KEY];
+
+        if ($failureThreshold < 1 || $cooldownPeriod < 1 || $successThreshold < 1) {
+            throw new InvalidConfigurationException(
+                'Service configuration values must be positive integers'
+            );
+        }
+
         return new self(
-            $config[self::FAILURE_THRESHOLD_KEY],
-            $config[self::COOLDOWN_PERIOD_KEY],
-            $config[self::SUCCESS_THRESHOLD_KEY],
+            failureThreshold: $failureThreshold,
+            cooldownPeriod: $cooldownPeriod,
+            successThreshold: $successThreshold
         );
     }
 
