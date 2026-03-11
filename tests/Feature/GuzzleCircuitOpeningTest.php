@@ -1,6 +1,7 @@
 <?php
 
 use AlgoYounes\CircuitBreaker\Enums\CircuitStatus;
+use AlgoYounes\CircuitBreaker\Guzzle\Exceptions\RejectedException;
 use AlgoYounes\CircuitBreaker\Managers\CircuitManager;
 use AlgoYounes\CircuitBreaker\Middleware\GuzzleMiddleware;
 use GuzzleHttp\Client;
@@ -201,5 +202,5 @@ it('short-circuits requests after circuit opens via Guzzle failures', function (
     // Next request should be short-circuited (not reach handler)
     expect(fn () => $client->get('http://test.example.com', [
         'headers' => ['X-Circuit-Key' => $service],
-    ]))->toThrow(\AlgoYounes\CircuitBreaker\Guzzle\Exceptions\RejectedException::class);
+    ]))->toThrow(RejectedException::class);
 });

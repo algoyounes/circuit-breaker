@@ -5,6 +5,8 @@ namespace AlgoYounes\CircuitBreaker\Tests;
 use AlgoYounes\CircuitBreaker\Contracts\StateManagerContract;
 use AlgoYounes\CircuitBreaker\Managers\CircuitManager;
 use AlgoYounes\CircuitBreaker\Providers\CircuitBreakerServiceProvider;
+use Illuminate\Cache\ArrayStore;
+use Illuminate\Cache\Repository;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
@@ -22,8 +24,8 @@ abstract class TestCase extends BaseTestCase
     protected function getEnvironmentSetUp($app): void
     {
         $app->singleton('cache', function ($app) {
-            return new \Illuminate\Cache\Repository(
-                new \Illuminate\Cache\ArrayStore
+            return new Repository(
+                new ArrayStore
             );
         });
 

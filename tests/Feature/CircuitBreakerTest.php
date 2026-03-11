@@ -3,8 +3,11 @@
 use AlgoYounes\CircuitBreaker\Guzzle\Exceptions\RejectedException;
 use AlgoYounes\CircuitBreaker\Middleware\GuzzleMiddleware;
 use AlgoYounes\CircuitBreaker\ValueObjects\CircuitResult;
+use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Promise\Create;
+use GuzzleHttp\Psr7\Response;
 
 it('returns success packet when circuit is closed and operation succeeds', function () {
     $operation = fn () => 'payment processed';
@@ -128,12 +131,12 @@ it('closes circuit after cooldown elapsed and successful probe', function () {
     // Arrange: Open circuit and simulate cooldown period has elapsed using Carbon::setTestNow
     $this->stateManager->open('payment-service');
 
-    \Carbon\Carbon::setTestNow(\Carbon\Carbon::now()->addSeconds(120));
+    Carbon::setTestNow(Carbon::now()->addSeconds(120));
     try {
         $result = $this->circuitManager->run('payment-service', fn () => 'ok');
     } finally {
         // Reset time travel
-        \Carbon\Carbon::setTestNow();
+        Carbon::setTestNow();
     }
 
     expect($result)->toBeInstanceOf(CircuitResult::class)
@@ -156,7 +159,7 @@ it('short-circuits without invoking the handler when circuit is open', function 
     $baseHandler = function ($request, array $options) use (&$invoked) {
         $invoked = true;
 
-        return \GuzzleHttp\Promise\Create::promiseFor(new \GuzzleHttp\Psr7\Response(200));
+        return Create::promiseFor(new Response(200));
     };
 
     $stack = new HandlerStack($baseHandler);

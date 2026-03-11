@@ -66,7 +66,7 @@ class CallbackHandler
             $this->trigger($this->onSuccessCallback, $result, $context);
         }
 
-        if (! $this->onFailureCallback instanceof \Closure) {
+        if (! $this->onFailureCallback instanceof Closure) {
             return;
         }
 

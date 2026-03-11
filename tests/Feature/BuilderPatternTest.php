@@ -1,11 +1,13 @@
 <?php
 
+use AlgoYounes\CircuitBreaker\Contracts\StateManagerContract;
 use AlgoYounes\CircuitBreaker\Enums\CircuitStatus;
+use AlgoYounes\CircuitBreaker\Managers\CircuitManager;
 use AlgoYounes\CircuitBreaker\ValueObjects\CircuitTransition;
 
 beforeEach(function () {
-    $this->circuitManager = app(\AlgoYounes\CircuitBreaker\Managers\CircuitManager::class);
-    $this->stateManager = app(\AlgoYounes\CircuitBreaker\Contracts\StateManagerContract::class);
+    $this->circuitManager = app(CircuitManager::class);
+    $this->stateManager = app(StateManagerContract::class);
 });
 
 it('executes operation using builder pattern', function () {
