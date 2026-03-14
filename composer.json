@@ -56,25 +56,6 @@
         "fix": [
             "@fix:refactor",
             "@fix:lint"
-        ],
-        "hook": [
-            "@hook:pre-commit",
-            "@hook:pre-push"
-        ],
-        "hook:install": [
-            "ln -sf $PWD/hooks/pre-commit .git/hooks/pre-commit",
-            "chmod +x .git/hooks/pre-commit",
-            "ln -sf $PWD/hooks/pre-push .git/hooks/pre-push",
-            "chmod +x .git/hooks/pre-push"
-        ],
-        "hook:pre-commit": [
-            "hooks/pre-commit"
-        ],
-        "hook:pre-push": [
-            "hooks/pre-push"
-        ],
-        "post-install-cmd": [
-            "@hook:install"
         ]
     },
     "config": {

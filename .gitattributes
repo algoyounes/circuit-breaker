@@ -4,7 +4,6 @@
 .gitignore        export-ignore
 /assets           export-ignore
 /.github          export-ignore
-/hooks            export-ignore
 /tests            export-ignore
 phpunit.xml       export-ignore
 phpstan.neon.dist export-ignore
