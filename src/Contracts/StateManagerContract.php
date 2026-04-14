@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AlgoYounes\CircuitBreaker\Contracts;
 
 use AlgoYounes\CircuitBreaker\Enums\CircuitStatus;

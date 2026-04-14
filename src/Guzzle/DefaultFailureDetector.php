@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AlgoYounes\CircuitBreaker\Guzzle;
 
 use AlgoYounes\CircuitBreaker\Guzzle\Contracts\FailureDetectorContract;
