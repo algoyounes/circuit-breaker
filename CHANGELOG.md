@@ -2,6 +2,29 @@
 
 All notable changes to `laravel circuit breaker` will be documented in this file
 
+## v1.8 - 2026-04-14
+
+### Changes
+
+#### Features
+
+- Laravel Http Facade Integration — Use `Http::withCircuitBreaker('service-name')` to apply circuit breaker logic directly with Laravel's built-in Http client.
+- Single-Probe Half-Open State — When the circuit transitions from **OPEN** to **HALF-OPEN**, only one request is allowed to probe the recovering service. All other concurrent requests are
+  rejected immediately until the probe completes.
+
+#### Fix
+
+- Half-Open Race Condition, Fixed a concurrency issue where multiple **PHP-FPM** workers could simultaneously probe a recovering service during the **OPEN → HALF-OPEN** transition, potentially
+  overwhelming it with requests.
+
+#### Doc
+
+- Updated README with Http facade usage, half-open state behavior, state transitions diagram, and configuration reference.
+
+**All changes in a single commit**: https://github.com/algoyounes/circuit-breaker/commit/53c6985
+
+**Full Changelog**: https://github.com/algoyounes/circuit-breaker/compare/v1.7...v1.8
+
 ## v1.7 - 2026-03-14
 
 **Full Changelog**: https://github.com/algoyounes/circuit-breaker/compare/v1.6...v1.7
