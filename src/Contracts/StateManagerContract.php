@@ -23,4 +23,8 @@ interface StateManagerContract
     public function hasExceededThreshold(string $service): bool;
 
     public function hasSufficientSuccess(string $service): bool;
+
+    public function lockHalfOpen(string $service): bool;
+
+    public function unlockHalfOpen(string $service): void;
 }

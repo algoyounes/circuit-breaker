@@ -17,6 +17,7 @@ class CircuitStateCacheManager implements StateManagerContract
     private const COOLDOWN_END_SUFFIX = 'cooldown_end';
     private const FAILURE_SUFFIX = 'failure';
     private const SUCCESS_SUFFIX = 'success';
+    private const HALF_OPEN_LOCK_SUFFIX = 'half_open_lock';
 
     public function __construct(
         private readonly CircuitBreakerConfig $config,
@@ -145,6 +146,19 @@ class CircuitStateCacheManager implements StateManagerContract
         $threshold = $this->config->getServiceConfig($service)->getSuccessThreshold();
 
         return $this->getCounter($service, self::SUCCESS_SUFFIX) >= $threshold;
+    }
+
+    public function lockHalfOpen(string $service): bool
+    {
+        $key = $this->getCacheKey($service, self::HALF_OPEN_LOCK_SUFFIX);
+        $ttl = $this->config->getServiceConfig($service)->getCooldownPeriod();
+
+        return $this->cache->add($key, true, max(1, $ttl));
+    }
+
+    public function unlockHalfOpen(string $service): void
+    {
+        $this->cache->forget($this->getCacheKey($service, self::HALF_OPEN_LOCK_SUFFIX));
     }
 
     private function resetCounters(string $service): void

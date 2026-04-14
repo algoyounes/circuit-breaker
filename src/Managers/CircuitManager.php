@@ -78,6 +78,7 @@ class CircuitManager
         }
 
         $status = $this->getStatus($service);
+        $acquiredLock = false;
 
         // Return early if the service is OPEN and in cooldown
         if ($status->equals(CircuitStatus::OPEN) && $this->stateManager->isInCooldown($service)) {
@@ -85,9 +86,24 @@ class CircuitManager
         }
 
         // Transition to half-open if the status is OPEN and not in cooldown
+        // Single-probe: only one request is allowed to probe at a time
         if ($status->equals(CircuitStatus::OPEN)) {
+            if (! $this->stateManager->lockHalfOpen($service)) {
+                return CircuitResult::circuitOpen($service);
+            }
+
+            $acquiredLock = true;
             $this->stateManager->halfOpen($service);
             $status = CircuitStatus::HALF_OPEN;
+        }
+
+        // Already HALF_OPEN (transitioned by another worker) — still need the lock
+        if ($status->equals(CircuitStatus::HALF_OPEN) && ! $acquiredLock) {
+            if (! $this->stateManager->lockHalfOpen($service)) {
+                return CircuitResult::circuitOpen($service);
+            }
+
+            $acquiredLock = true;
         }
 
         try {
@@ -118,6 +134,10 @@ class CircuitManager
             }
 
             return CircuitResult::failure($e, $this->getStatus($service));
+        } finally {
+            if ($acquiredLock) {
+                $this->stateManager->unlockHalfOpen($service);
+            }
         }
     }
 }

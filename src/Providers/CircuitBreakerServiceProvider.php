@@ -10,10 +10,12 @@ use AlgoYounes\CircuitBreaker\Guzzle\DefaultFailureDetector;
 use AlgoYounes\CircuitBreaker\Guzzle\ServiceNameExtractor;
 use AlgoYounes\CircuitBreaker\Managers\CircuitManager;
 use AlgoYounes\CircuitBreaker\Managers\State\Cache\CircuitStateCacheManager;
+use AlgoYounes\CircuitBreaker\Middleware\GuzzleMiddleware;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Foundation\Application;
+use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\ServiceProvider;
 
 class CircuitBreakerServiceProvider extends ServiceProvider
@@ -27,6 +29,12 @@ class CircuitBreakerServiceProvider extends ServiceProvider
                 dirname(__DIR__, 2).'/config/circuit-breaker.php' => config_path('circuit-breaker.php'),
             ], 'config');
         }
+
+        PendingRequest::macro('withCircuitBreaker', function (string $serviceName) {
+            /** @var PendingRequest $this */
+            return $this->withMiddleware(GuzzleMiddleware::create())
+                ->withOptions(['circuit-breaker.service_name' => $serviceName]);
+        });
     }
 
     public function register(): void

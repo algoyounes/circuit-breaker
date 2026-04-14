@@ -17,6 +17,22 @@ The following diagram illustrates how the **Circuit Breaker Pattern** works:
 
 For more info, check the official pattern doc [here](https://learn.microsoft.com/en-us/azure/architecture/patterns/circuit-breaker).
 
+## Table of Contents
+
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Custom Callbacks](#custom-callbacks)
+  - [Running an Operation](#running-an-operation)
+  - [Guzzle Middleware Integration](#guzzle-middleware-integration)
+  - [Laravel Http Facade Integration](#laravel-http-facade-integration)
+- [How It Works](#how-it-works)
+  - [State Transitions](#state-transitions)
+  - [Half-Open State Behavior](#half-open-state-behavior)
+- [Configuration](#configuration)
+- [Contributing](#contributing)
+- [License](#license)
+
 ## Prerequisites
 
 This package requires:
@@ -54,7 +70,7 @@ You can define callbacks for key circuit states:
 | Callback        | Description                                                                               | Parameters Received                  |
 |-----------------|-------------------------------------------------------------------------------------------|--------------------------------------| 
 | `onOpen`        | Triggered when the circuit goes into **OPEN**, blocking calls to prevent further failures | `CircuitTransition`                  |
-| `onHalfOpen`    | The circuit enters **HALF-OPEN** to test stability, letting a few requests through        | `CircuitTransition`                  |
+| `onHalfOpen`    | The circuit enters **HALF-OPEN** to test stability, letting one request through           | `CircuitTransition`                  |
 | `onClose`       | The circuit returns to **CLOSED**, allowing all requests without restrictions             | `CircuitTransition`                  |
 | `onSuccess`     | Fires when a request succeeds, indicating system availability                             | `CircuitResult`, `CircuitTransition` |
 | `onFailure`     | Triggered when a request fails, potentially opening the circuit                           | `CircuitResult`, `CircuitTransition` |
@@ -129,6 +145,119 @@ $response = $client->get('https://api.example.com', [
         'X-Circuit-Key' => 'service-name',
     ],
 ]);
+```
+
+### Laravel Http Facade Integration
+
+The package integrates with Laravel's built-in `Http` facade out of the box:
+
+```php
+use Illuminate\Support\Facades\Http;
+
+$response = Http::withCircuitBreaker('payment-service')
+    ->get('https://api.payment.com/charge', [
+        'amount' => 1000,
+    ]);
+```
+
+This automatically applies the circuit breaker middleware to the request using `payment-service` as the circuit key. You can chain it with any `Http` method:
+
+```php
+$response = Http::withCircuitBreaker('shipping-service')
+    ->withToken($apiToken)
+    ->timeout(10)
+    ->post('https://api.example.com/track', $payload);
+```
+
+When the circuit is open, a `RejectedException` is thrown:
+
+```php
+use AlgoYounes\CircuitBreaker\Guzzle\Exceptions\RejectedException;
+
+try {
+    $response = Http::withCircuitBreaker('payment-service')
+        ->get('https://api.example.com/charge');
+} catch (RejectedException $e) {
+    // Circuit is open — handle gracefully (e.g., return cached response, queue for retry)
+}
+```
+
+## How It Works
+
+### State Transitions
+
+The circuit breaker operates in three states:
+
+```
+    ┌──────────────────────────────────────────────────────┐
+    │                                                      │
+    ▼                                                      │
+ CLOSED ──── failures ≥ threshold ────► OPEN               │
+ (normal)                               (all requests      │
+                                         rejected)         │
+                                           │               │
+                                    cooldown expires       │
+                                           │               │
+                                           ▼               │
+                                       HALF-OPEN           │
+                                      (single probe)       │
+                                        │       │          │
+                                   success    failure      │
+                                        │       │          │
+                                        │       └──► OPEN  │
+                                        │                  │
+                                        └──────────────────┘
+```
+
+- **CLOSED** — Normal operation. All requests pass through. Failures are counted.
+- **OPEN** — The service is considered down. All requests are rejected immediately without calling the service. After the `cooldown_period` expires, the circuit moves to HALF-OPEN.
+- **HALF-OPEN** — A single probe request is sent to test the service. If it succeeds, the circuit closes. If it fails, the circuit re-opens.
+
+### Half-Open State Behavior
+
+When a circuit transitions from **OPEN** to **HALF-OPEN**, this package uses a **single-probe** approach — only one request is allowed to test the recovering service at a time. All other concurrent requests are rejected immediately until the probe completes.
+
+```
+OPEN (cooldown expired)
+  │
+  ├── Request A → probes service → success → CLOSED (all traffic resumes)
+  ├── Request B → rejected (fail-fast)
+  ├── Request C → rejected (fail-fast)
+  └── ...
+```
+
+- If the probe **succeeds**, the circuit closes and normal traffic resumes.
+- If the probe **fails**, the circuit re-opens and a new cooldown period begins.
+
+**What your code receives when a request is rejected:**
+
+- Via `run()` — returns a `CircuitResult` where `isSuccess()` and `isAvailable()` both return `false`
+- Via `Http::withCircuitBreaker()` or Guzzle middleware — throws `RejectedException`
+
+## Configuration
+
+After publishing the config file, you can adjust these settings in `config/circuit-breaker.php`:
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `enabled` | `true` | Enable or disable the circuit breaker globally |
+| `defaults.failure_threshold` | `5` | Number of failures before the circuit opens |
+| `defaults.cooldown_period` | `60` | Seconds to wait before transitioning from OPEN to HALF-OPEN |
+| `defaults.success_threshold` | `1` | Successful probes needed in HALF-OPEN to close the circuit |
+| `cache.ttl` | `86400` | Cache entry lifetime in seconds |
+| `cache.prefix` | `circuit-breaker` | Prefix for cache keys |
+| `cache.store` | `default` | Laravel cache store to use |
+
+You can also override settings per service:
+
+```php
+'services' => [
+    'payment-service' => [
+        'failure_threshold' => 10,
+        'cooldown_period'   => 120,
+        'success_threshold' => 3,
+    ],
+],
 ```
 
 ## Contributing
