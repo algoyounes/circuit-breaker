@@ -2,6 +2,18 @@
 
 All notable changes to `laravel circuit breaker` will be documented in this file
 
+## v1.8.1 - 2026-06-11
+
+### What's Changed
+
+* Added support for Laravel 13 by @kavinsky in https://github.com/algoyounes/circuit-breaker/pull/11
+
+### New Contributors
+
+* @kavinsky made their first contribution in https://github.com/algoyounes/circuit-breaker/pull/11
+
+**Full Changelog**: https://github.com/algoyounes/circuit-breaker/compare/v1.8...v1.8.1
+
 ## v1.8 - 2026-04-14
 
 ### Changes
